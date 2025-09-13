@@ -1,0 +1,278 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Buscar Medicamentos - Admin{% endblock %}
+{% block page_title %}Buscar Medicamentos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-search me-2 text-info"></i>
+                Buscar Medicamentos
+            </h4>
+            <p class="text-muted mb-0">Busca medicamentos por diferentes criterios</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('admin_routes.medicamentos') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Medicamentos
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>
+                        Criterios de Búsqueda
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="searchForm">
+                        <div class="row">
+                            <!-- Nombre -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">
+                                    <i class="fas fa-pills me-1"></i>Nombre del Medicamento
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombre" 
+                                       name="nombre" 
+                                       placeholder="Buscar por nombre"
+                                       value="{{ request.form.nombre if request.method == 'POST' else '' }}">
+                            </div>
+
+                            <!-- Tipo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Tipo
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="tipo" 
+                                       name="tipo" 
+                                       placeholder="Buscar por tipo"
+                                       value="{{ request.form.tipo if request.method == 'POST' else '' }}">
+                                <div class="form-text">
+                                    <small>Ej: Analgésico, Antibiótico, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Referencia -->
+                            <div class="col-md-6 mb-3">
+                                <label for="referencia" class="form-label">
+                                    <i class="fas fa-barcode me-1"></i>Referencia
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="referencia" 
+                                       name="referencia" 
+                                       placeholder="Buscar por referencia"
+                                       value="{{ request.form.referencia if request.method == 'POST' else '' }}">
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>
+                                    Buscar Medicamentos
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <small>Puedes usar uno o más criterios para refinar tu búsqueda. Deja los campos vacíos para ver todos los medicamentos.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tipos más comunes -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Tipos Comunes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Analgésico')">
+                            Analgésico
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Antibiótico')">
+                            Antibiótico
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Antiinflamatorio')">
+                            Antiinflamatorio
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Antihistamínico')">
+                            Antihistamínico
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Vitaminas')">
+                            Vitaminas
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Suplementos')">
+                            Suplementos
+                        </span>
+                         <span class="badge bg-info cursor-pointer" onclick="setTipo('AINES')">
+                            AINES
+                        </span>
+                        <span class="badge bg-info cursor-pointer" onclick="setTipo('Antidiarreico')">
+                            Antidiarreico
+                        </span>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">Haz clic en un tipo para usarlo en la búsqueda</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if search_performed %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Resultados de la Búsqueda
+                    </h6>
+                    <span class="badge bg-primary">
+                        {{ medicamentos|length }} resultado{{ 's' if medicamentos|length != 1 else '' }}
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    {% if medicamentos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Foto</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Referencia</th>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicamento in medicamentos %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold text-primary">#{{ medicamento.id }}</span>
+                                    </td>
+                                    <td>
+                                        {% if medicamento.foto %}
+                                        <img src="data:{{ medicamento.tipo_mime }};base64,{{ medicamento.foto }}" 
+                                             alt="{{ medicamento.nombreMedicamento }}" 
+                                             class="rounded" 
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-pills text-secondary"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium">{{ medicamento.nombreMedicamento }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-tag me-1"></i>{{ medicamento.tipo }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <code class="bg-light text-dark px-2 py-1 rounded">{{ medicamento.referencia }}</code>
+                                    </td>
+                                    <td>
+                                        {% if medicamento.descripcion %}
+                                        <small class="text-muted">{{ medicamento.descripcion|truncate(50) }}</small>
+                                        {% else %}
+                                        <span class="text-muted fst-italic">Sin descripción</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('admin_routes.view_medicamento', medicamento_id=medicamento.id) }}" 
+                                               class="btn btn-sm btn-outline-info" 
+                                               title="Ver">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_routes.edit_medicamento', medicamento_id=medicamento.id) }}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_routes.medicamentos') }}" 
+                                               class="btn btn-sm btn-outline-secondary" 
+                                               title="Volver a lista">
+                                                <i class="fas fa-list"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No se encontraron resultados</h5>
+                        <p class="text-muted mb-3">Intenta con otros criterios de búsqueda</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Función para establecer el tipo desde los badges
+function setTipo(tipo) {
+    document.getElementById('tipo').value = tipo;
+    document.getElementById('tipo').focus();
+}
+
+// Opcional: Auto-enfoque en el primer campo al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    const nombreField = document.getElementById('nombre');
+    if (nombreField && !nombreField.value) {
+        nombreField.focus();
+    }
+});
+</script>
+
+<style>
+.cursor-pointer {
+    cursor: pointer;
+}
+.cursor-pointer:hover {
+    opacity: 0.8;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Agregar Medicamento - Admin{% endblock %}
+{% block page_title %}Agregar Medicamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-pills me-2 text-success"></i>
+                Agregar Nuevo Medicamento
+            </h4>
+            <p class="text-muted mb-0">Completa el formulario para crear un nuevo medicamento</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('admin_routes.medicamentos') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Medicamentos
+            </a>
+        </div>
+    </div>
+
+    <!-- Add Medicamento Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-form me-2 text-primary"></i>
+                        Información del Medicamento
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="addMedicamentoForm" enctype="multipart/form-data">
+                        <div class="row">
+                            <!-- Nombre Medicamento -->
+                            <div class="col-md-12 mb-3">
+                                <label for="nombreMedicamento" class="form-label">
+                                    <i class="fas fa-pills me-1"></i>Nombre del Medicamento *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombreMedicamento" 
+                                       name="nombreMedicamento" 
+                                       placeholder="Ingrese el nombre del medicamento"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Tipo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Tipo *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="tipo" 
+                                       name="tipo" 
+                                       placeholder="Ej: Analgésico, Antibiótico"
+                                       required>
+                                <div class="form-text">
+                                    <small>Ejemplo: Analgésico, Antibiótico, Antiinflamatorio, etc.</small>
+                                </div>
+                            </div>
+
+                            <!-- Referencia -->
+                            <div class="col-md-6 mb-3">
+                                <label for="referencia" class="form-label">
+                                    <i class="fas fa-barcode me-1"></i>Referencia *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="referencia" 
+                                       name="referencia" 
+                                       placeholder="Código de referencia"
+                                       required>
+                                <div class="form-text">
+                                    <small>Código único de identificación del medicamento</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Descripción -->
+                            <div class="col-md-12 mb-3">
+                                <label for="descripcion" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>Descripción
+                                </label>
+                                <textarea class="form-control" 
+                                          id="descripcion" 
+                                          name="descripcion" 
+                                          rows="3" 
+                                          placeholder="Descripción opcional del medicamento"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Foto -->
+                            <div class="col-md-12 mb-3">
+                                <label for="foto" class="form-label">
+                                    <i class="fas fa-image me-1"></i>Foto del Medicamento
+                                </label>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="foto" 
+                                       name="foto" 
+                                       accept="image/*">
+                                <div class="form-text">
+                                    <small>Formatos permitidos: PNG, JPG, JPEG, GIF, WEBP, BMP. Máximo 5MB.</small>
+                                </div>
+                                <div class="mt-2" id="imagePreview" style="display: none;">
+                                    <img id="previewImage" src="#" alt="Vista previa" class="img-thumbnail mt-2" style="max-height: 200px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ url_for('admin_routes.medicamentos') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save me-2"></i>
+                                        Crear Medicamento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Vista previa de la imagen
+document.getElementById('foto').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('previewImage');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+});
+
+// Validación básica del formulario
+document.getElementById('addMedicamentoForm').addEventListener('submit', function(e) {
+    const nombreMedicamento = document.getElementById('nombreMedicamento').value.trim();
+    const tipo = document.getElementById('tipo').value.trim();
+    const referencia = document.getElementById('referencia').value.trim();
+    const foto = document.getElementById('foto').files[0];
+    
+    if (!nombreMedicamento || !tipo || !referencia) {
+        e.preventDefault();
+        alert('Los campos marcados con * son obligatorios.');
+        return false;
+    }
+    
+    // Validar tamaño de archivo si se subió uno
+    if (foto && foto.size > 5 * 1024 * 1024) {
+        e.preventDefault();
+        alert('La imagen no puede superar los 5MB.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

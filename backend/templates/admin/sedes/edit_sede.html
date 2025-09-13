@@ -1,0 +1,163 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Editar Sede - Admin{% endblock %}
+{% block page_title %}Editar Sede{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-edit me-2 text-warning"></i>
+                Editar Sede: {{ sede.nombreSede }}
+            </h4>
+            <p class="text-muted mb-0">Modifica la información de la sede seleccionada</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('admin_routes.sedes') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Sedes
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Edit Sede Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-form me-2 text-primary"></i>
+                        Información de la Sede
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="editSedeForm">
+                        <div class="row">
+                            <!-- Nombre Sede -->
+                            <div class="col-md-12 mb-3">
+                                <label for="nombreSede" class="form-label">
+                                    <i class="fas fa-building me-1"></i>Nombre de la Sede *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombreSede" 
+                                       name="nombreSede" 
+                                       value="{{ sede.nombreSede }}"
+                                       placeholder="Ingrese el nombre de la sede"
+                                       required>
+                                <div class="form-text">
+                                    <small>Ejemplo: Sede Principal, Sede Norte, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Ciudad -->
+                            <div class="col-md-6 mb-3">
+                                <label for="ciudad" class="form-label">
+                                    <i class="fas fa-city me-1"></i>Ciudad *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="ciudad" 
+                                       name="ciudad" 
+                                       value="{{ sede.ciudad }}"
+                                       placeholder="Ingrese la ciudad"
+                                       required>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="col-md-6 mb-3">
+                                <label for="ubicacion" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Ubicación *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="ubicacion" 
+                                       name="ubicacion" 
+                                       value="{{ sede.ubicacion }}"
+                                       placeholder="Ingrese la ubicación"
+                                       required>
+                                <div class="form-text">
+                                    <small>Ejemplo: Av. Principal #123, Centro Comercial XYZ, etc.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Info Display -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Información Actual
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">ID:</small> <strong>#{{ sede.id }}</strong><br>
+                                            <small class="text-muted">Nombre Actual:</small> {{ sede.nombreSede }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Ciudad Actual:</small> {{ sede.ciudad }}<br>
+                                            <small class="text-muted">Ubicación Actual:</small> {{ sede.ubicacion }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ url_for('admin_routes.sedes') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-2"></i>
+                                        Actualizar Sede
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validación básica del formulario
+document.getElementById('editSedeForm').addEventListener('submit', function(e) {
+    const nombreSede = document.getElementById('nombreSede').value.trim();
+    const ciudad = document.getElementById('ciudad').value.trim();
+    const ubicacion = document.getElementById('ubicacion').value.trim();
+    
+    if (!nombreSede || !ciudad || !ubicacion) {
+        e.preventDefault();
+        alert('Todos los campos marcados con * son obligatorios.');
+        return false;
+    }
+});
+</script>
+{% endblock %}
