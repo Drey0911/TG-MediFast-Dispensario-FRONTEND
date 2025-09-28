@@ -1,9 +1,12 @@
+import secrets
+import string
 from models.userModel import User
 from config.connection import db
 import jwt
 import os
 import re
 from datetime import datetime, timedelta
+from services.whatsappService import whatsapp_service
 
 class UserService:
     @staticmethod
@@ -37,6 +40,74 @@ class UserService:
             return False, "\n".join(errors)
         
         return True, None
+    
+    
+    @staticmethod
+    def generate_random_password(length=10):
+        """
+        Genera una contraseña aleatoria que cumple con los requisitos de seguridad
+        """
+        # Definir caracteres para cada categoría
+        lowercase = string.ascii_lowercase
+        uppercase = string.ascii_uppercase
+        digits = string.digits
+        symbols = "!@#$%^&*"
+        
+        # Asegurar al menos un carácter de cada categoría
+        password = [
+            secrets.choice(lowercase),
+            secrets.choice(uppercase),
+            secrets.choice(digits),
+            secrets.choice(symbols)
+        ]
+        
+        # Completar el resto de la contraseña con caracteres aleatorios
+        all_chars = lowercase + uppercase + digits + symbols
+        for _ in range(length - 4):
+            password.append(secrets.choice(all_chars))
+        
+        # Mezclar la contraseña
+        secrets.SystemRandom().shuffle(password)
+        
+        return ''.join(password)
+    
+    @staticmethod
+    def recover_password(dni, telefono):
+        """
+        Recupera la contraseña de un usuario y envía una nueva por WhatsApp
+        """
+        try:
+            # Buscar el usuario por DNI y teléfono
+            user = User.query.filter_by(dni=dni, telefono=telefono).first()
+            
+            if not user:
+                return None, "No se encontró un usuario con esos datos"
+            
+            # Generar nueva contraseña temporal
+            nueva_password = UserService.generate_random_password()
+            
+            # Actualizar la contraseña en la base de datos
+            user.set_password(nueva_password)
+            db.session.commit()
+            
+            # Enviar la nueva contraseña por WhatsApp
+            nombre_completo = f"{user.nombre} {user.apellidos}"
+            whatsapp_sent = whatsapp_service.send_password_recovery(
+                to_number=telefono,
+                nombre_usuario=nombre_completo,
+                nueva_password=nueva_password
+            )
+            
+            if not whatsapp_sent:
+                # Si falla el envío de WhatsApp, revertir el cambio de contraseña
+                db.session.rollback()
+                return None, "Error al enviar el mensaje de WhatsApp. Inténtalo de nuevo."
+            
+            return {"message": "Nueva contraseña enviada por WhatsApp"}, None
+            
+        except Exception as e:
+            db.session.rollback()
+            return None, str(e)
     
     @staticmethod
     def create_user(nombre, apellidos, dni, telefono, password, rol='user'):
@@ -149,7 +220,7 @@ class UserService:
     @staticmethod
     def generate_jwt(user_data):
         payload = {
-            'sub': user_data['id'],
+            'sub': str(user_data['id']),
             'nombre': user_data['nombre'],
             'apellidos': user_data['apellidos'],
             'dni': user_data['dni'],

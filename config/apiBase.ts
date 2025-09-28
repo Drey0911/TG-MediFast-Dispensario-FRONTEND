@@ -4,7 +4,7 @@ export interface AppConfig {
 }
 
 const config: AppConfig = {
-  API_BASE_URL: 'http://192.168.1.51:5000' //   IP DE LA API DEL BACKEND
+  API_BASE_URL: 'http://192.168.1.51:5000' //API Medifast
 };
 
 export const getConfig = (): AppConfig => {

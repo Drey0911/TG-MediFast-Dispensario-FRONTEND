@@ -1,0 +1,198 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Editar Recolección - Admin{% endblock %}
+{% block page_title %}Editar Recolección: {{ norecoleccion }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-edit me-2 text-warning"></i>
+                Editar Recolección: {{ norecoleccion }}
+            </h4>
+            <p class="text-muted mb-0">Modifica el estado de la recolección seleccionada</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('admin_routes.recolecciones') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Recolecciones
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Edit Recoleccion Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-form me-2 text-primary"></i>
+                        Información de la Recolección
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="editRecoleccionForm">
+                        <!-- Información de la recolección -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">No. Recolección</label>
+                                    <p class="form-control-plaintext">
+                                        <i class="fas fa-hashtag me-2 text-primary"></i>
+                                        {{ norecoleccion }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">Usuario</label>
+                                    <p class="form-control-plaintext">
+                                        <i class="fas fa-user me-2 text-primary"></i>
+                                        {{ recolecciones[0].usuario.nombre }} {{ recolecciones[0].usuario.apellido }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">Fecha</label>
+                                    <p class="form-control-plaintext">
+                                        <i class="fas fa-calendar me-2 text-muted"></i>
+                                        {{ recolecciones[0].fechaRecoleccion }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">Hora Recolección</label>
+                                    <p class="form-control-plaintext">
+                                        <i class="fas fa-clock me-2 text-muted"></i>
+                                        {{ recolecciones[0].horaRecoleccion }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label fw-bold">Hora Vencimiento</label>
+                                    <p class="form-control-plaintext">
+                                        <i class="fas fa-hourglass-end me-2 text-muted"></i>
+                                        {{ recolecciones[0].horaVencimiento }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de medicamentos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Medicamentos</label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicamento</th>
+                                                <th>Sede</th>
+                                                <th class="text-center">Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for rec in recolecciones %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-2" 
+                                                            style="width: 30px; height: 30px;">
+                                                            <i class="fas fa-pills text-info" style="font-size: 0.8rem;"></i>
+                                                        </div>
+                                                        <div>
+                                                            {{ rec.medicamento.nombreMedicamento }}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ rec.sede.nombreSede if rec.sede else 'Sin sede asociada' }}</td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-secondary">{{ rec.cantidad }}</span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estado (editable) -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="cumplimiento" class="form-label fw-bold">
+                                    <i class="fas fa-check-circle me-1"></i>Estado de Cumplimiento *
+                                </label>
+                                <select class="form-select" id="cumplimiento" name="cumplimiento" required>
+                                    <option value="1" {% if recolecciones[0].cumplimiento == 1 %}selected{% endif %}>Cumplida</option>
+                                    <option value="0" {% if recolecciones[0].cumplimiento == 0 %}selected{% endif %}>Pendiente</option>
+                                    <option value="3" {% if recolecciones[0].cumplimiento == 3 %}selected{% endif %}>Vencida</option>
+                                    <option value="4" {% if recolecciones[0].cumplimiento == 4 %}selected{% endif %}>Cancelada</option>
+                                </select>
+                                <div class="form-text">
+                                    <small>
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Al marcar como "Vencida", el stock de todos los medicamentos será devuelto a la disponibilidad.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ url_for('admin_routes.recolecciones') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-2"></i>
+                                        Actualizar Recolección
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validación básica del formulario
+document.getElementById('editRecoleccionForm').addEventListener('submit', function(e) {
+    const cumplimiento = document.getElementById('cumplimiento').value;
+
+    if (cumplimiento === '') {
+        e.preventDefault();
+        alert('Por favor selecciona un estado de cumplimiento.');
+    }
+});
+</script>
+{% endblock %}

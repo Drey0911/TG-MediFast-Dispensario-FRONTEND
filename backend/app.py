@@ -11,9 +11,15 @@ from routes.dispRoutes import disp_routes
 from models.recoleccionModel import Recoleccion
 from routes.recoleccionRoutes import recoleccion_routes
 from models.favModel import Favoritos
+from routes.favRoutes import favoritos_routes
 from socketsExtends import socketio  
 from routes.adminRoutes import admin_routes
-import os
+from services.reminderService import reminder_service
+import os, logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
@@ -30,7 +36,28 @@ def create_app():
     app.register_blueprint(med_routes, url_prefix='/api')  # Para acceso a rutas de API medicamentos
     app.register_blueprint(disp_routes, url_prefix='/api')  # Para acceso a rutas de API Disponibilidades
     app.register_blueprint(recoleccion_routes, url_prefix='/api')  # Para acceso a rutas de API Recolecciones
+    app.register_blueprint(favoritos_routes, url_prefix='/api')  # Para acceso a rutas de API Favoritos
     app.register_blueprint(admin_routes, url_prefix='/') # Para acceso a rutas del backend Modo admin
+    
+    # INICIALIZAR EL SERVICIO DE RECORDATORIOS CON LA APP
+    reminder_service.init_app(app)
+    
+    # Crear tablas al iniciar la aplicación
+    with app.app_context():
+        User.create_table_if_not_exists()
+        Sede.create_table_if_not_exists()
+        Medicamentos.create_table_if_not_exists()
+        Disponibilidad.create_table_if_not_exists()
+        Favoritos.create_table_if_not_exists()
+        Recoleccion.create_table_if_not_exists()
+        print("Tablas verificadas/creadas exitosamente")
+        
+        # Iniciar el servicio de recordatorios
+        try:
+            reminder_service.start_daily_reminders()
+            print("✅ Servicio de recordatorios iniciado correctamente")
+        except Exception as e:
+            print(f"❌ Error iniciando servicio de recordatorios: {str(e)}")
     
     return app
 
@@ -46,16 +73,6 @@ def handle_connect():
 def handle_disconnect():
     print('Cliente desconectado')
 
-# Crear tablas al iniciar la aplicación
-with app.app_context():
-    User.create_table_if_not_exists()
-    Sede.create_table_if_not_exists()
-    Medicamentos.create_table_if_not_exists()
-    Disponibilidad.create_table_if_not_exists()
-    Favoritos.create_table_if_not_exists()
-    Recoleccion.create_table_if_not_exists()
-    print("Tablas verificadas/creadas exitosamente")
-
 if __name__ == '__main__':
-    print("Iniciando servidor Flask con WebSockets...")
+    print("Iniciando servidor Backend de MediFast...")
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

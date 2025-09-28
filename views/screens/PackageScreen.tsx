@@ -140,52 +140,52 @@ const PackageScreen: React.FC = () => {
     }
   };
 
-  const scheduleRecoleccion = async () => {
-    if (carrito.length === 0) {
-      showAlert('Error', 'El paquete está vacío', 'error');
+const scheduleRecoleccion = async () => {
+  if (carrito.length === 0) {
+    showAlert('Error', 'El paquete está vacío', 'error');
+    return;
+  }
+
+  // Verificar que todas las recolecciones tengan fecha y hora
+  const incomplete = carrito.some(item => !item.fechaRecoleccion || !item.horaRecoleccion);
+  if (incomplete) {
+    showAlert('Error', 'Todos los medicamentos deben tener fecha y hora de recolección', 'error');
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const user = await AuthPresenter.getCurrentUser();
+    if (!user) {
+      showAlert('Error', 'Usuario no autenticado', 'error');
       return;
     }
 
-    // Verificar que todas las recolecciones tengan fecha y hora
-    const incomplete = carrito.some(item => !item.fechaRecoleccion || !item.horaRecoleccion);
-    if (incomplete) {
-      showAlert('Error', 'Todos los medicamentos deben tener fecha y hora de recolección', 'error');
-      return;
-    }
+    // Preparar datos para el batch
+    const recoleccionesData = carrito.map(item => ({
+      id_medicamento: item.medicamentoId,
+      id_usuario: user.id,
+      fechaRecoleccion: item.fechaRecoleccion,
+      horaRecoleccion: item.horaRecoleccion,
+      cantidad: item.cantidad,
+      id_sede: item.sedeId 
+    }));
 
-    try {
-      setLoading(true);
-      const user = await AuthPresenter.getCurrentUser();
-      if (!user) {
-        showAlert('Error', 'Usuario no autenticado', 'error');
-        return;
-      }
+    // Crear recolecciones en batch
+    await RecoleccionPresenter.createRecoleccionBatch(recoleccionesData);
 
-      // Preparar datos para el batch
-      const recoleccionesData = carrito.map(item => ({
-        id_medicamento: item.medicamentoId,
-        id_usuario: user.id,
-        fechaRecoleccion: item.fechaRecoleccion,
-        horaRecoleccion: item.horaRecoleccion,
-        cantidad: item.cantidad,
-        id_sede: item.sedeId
-      }));
-
-      // Crear recolecciones en batch
-      await RecoleccionPresenter.createRecoleccionBatch(recoleccionesData);
-
-      // Limpiar carrito
-      await clearCarrito();
-      
-      // Mostrar mensaje de éxito y navegar a Home
-      showAlert('Éxito', '¡Listo! Su recolección ya se agendó', 'success');
-      
-    } catch (error: any) {
-      showAlert('Error', error.message, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Limpiar carrito
+    await clearCarrito();
+    
+    // Mostrar mensaje de éxito y navegar a Home
+    showAlert('Éxito', '¡Listo! Su recolección ya se agendó', 'success');
+    
+  } catch (error: any) {
+    showAlert('Error', error.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAlertConfirm = () => {
     setAlertVisible(false);
@@ -275,7 +275,7 @@ const PackageScreen: React.FC = () => {
         </TouchableOpacity>
         
         <View style={styles.titleContainer}>
-          <Icon name="archive" size={30} color="white" style={styles.titleIcon} />
+          <Icon name="archive" size={24} color="white" style={styles.titleIcon} />
           <Text style={styles.titleText}>Paquete para Recoleccion</Text>
         </View>
         
@@ -306,16 +306,25 @@ const PackageScreen: React.FC = () => {
             contentContainerStyle={styles.listContainer}
           />
           
-          <View style={styles.footer}>
+            <View style={styles.footer}>
             <View style={styles.summaryContainer}>
               <Text style={styles.totalText}>
-                {carrito.length} medicamento{carrito.length !== 1 ? 's' : ''}
+              {carrito.length} medicamento{carrito.length !== 1 ? 's' : ''}
               </Text>
               <Text style={styles.totalCantidadText}>
-                {totalCantidad} unidad{totalCantidad !== 1 ? 'es' : ''} total
+              {totalCantidad} unidad{totalCantidad !== 1 ? 'es' : ''} total
               </Text>
             </View>
-            
+
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={() => navigation.navigate('Medicamentos')}
+              disabled={loading}
+            >
+              <Icon name="plus" size={20} color="white" />
+              <Text style={styles.addButtonText}>Agregar otro medicamento</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity 
               style={styles.scheduleButton}
               onPress={scheduleRecoleccion}
@@ -324,7 +333,7 @@ const PackageScreen: React.FC = () => {
               <Icon name="calendar-check-o" size={20} color="white" />
               <Text style={styles.scheduleButtonText}>Agendar Recolección</Text>
             </TouchableOpacity>
-          </View>
+            </View>
         </>
       )}
 
@@ -364,6 +373,21 @@ const PackageScreen: React.FC = () => {
 const { height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
+  addButton: {
+    flexDirection: 'row',
+    backgroundColor: '#3e9c6dff',
+    padding: 15,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: height * 0.030
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   container: { 
     flex: 1,
     backgroundColor: '#f5f5f5' 
@@ -389,7 +413,7 @@ const styles = StyleSheet.create({
     marginRight: 10 
   },
   titleText: { 
-    fontSize: 18, 
+    fontSize: 24, 
     fontWeight: 'bold', 
     color: 'white' 
   },

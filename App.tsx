@@ -11,15 +11,25 @@ import io, { Socket } from 'socket.io-client';
 import { getConfig } from './config/apiBase';
 import DetailScreen from './views/screens/DetailScreen';
 import PackageScreen from './views/screens/PackageScreen';
+import RecoleccionesScreen from './views/screens/RecoleccionesScreen';
+import HistorialScreen from './views/screens/HistorialScreen';
+import UserScreen from './views/screens/UserScreen';
+import FavoritosScreen from './views/screens/FavoritosScreen';
+import PasswordRecoveryScreen from './views/screens/PasswordRecoveryScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
+  PasswordRecovery: undefined;
   Register: undefined;
   Home: undefined;
+  Recolecciones: undefined;
   Medicamentos: undefined;
+  User: undefined;
+  Favoritos: undefined;
   Detail: { medicamentoId: number };
   Package: undefined;
+  Historial: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -118,9 +128,14 @@ const App: React.FC = () => {
           {(props) => <Splash {...props} nextScreen={nextScreen} />}
         </Stack.Screen>
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="PasswordRecovery" component={PasswordRecoveryScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Recolecciones" component={RecoleccionesScreen} />
         <Stack.Screen name="Medicamentos" component={MedicamentosScreen} />
+        <Stack.Screen name="Favoritos" component={FavoritosScreen} />
+        <Stack.Screen name="User" component={UserScreen} />
+        <Stack.Screen name="Historial" component={HistorialScreen} />
         <Stack.Screen name="Detail" component={DetailScreen} />
         <Stack.Screen name="Package" component={PackageScreen} />
       </Stack.Navigator>

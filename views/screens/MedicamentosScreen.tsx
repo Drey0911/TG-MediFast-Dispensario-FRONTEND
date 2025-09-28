@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect} from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   Image,
-  Dimensions,
   TouchableOpacity,
   FlatList,
+  Dimensions,
   TextInput,
   ScrollView
 } from 'react-native';
@@ -14,35 +14,16 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 import { MedicamentoPresenter } from '../../presenters/MedicamentoPresenter';
+import { FavoritoPresenter } from '../../presenters/FavoritoPresenter';
 import { Medicamento, Disponibilidad } from '../../models/Medicamento';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
-import Alert, { AlertType } from '../components/Alert';
+import AlertComponent, { AlertType } from '../components/Alert';
 import Loading from '../components/Loading';
-import io, { Socket } from 'socket.io-client';
-import { getConfig } from '../../config/apiBase';
 import { AuthPresenter } from '../../presenters/AuthPresenter';
 import { RecoleccionCarrito } from '../../models/Recoleccion';
 import { useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Variable global para mantener la instancia del socket
-let socket: Socket | null = null;
-
-const initSocket = async (): Promise<Socket> => {
-  if (socket) return socket;
-  
-  const token = await AuthPresenter.getToken();
-  const API_BASE_URL = `${getConfig().API_BASE_URL}`;
-  
-  socket = io(API_BASE_URL, {
-    auth: {
-      token: token
-    }
-  });
-  
-  return socket;
-};
 
 type MedicamentosScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Medicamentos'>;
 
@@ -52,17 +33,18 @@ const MedicamentosScreen: React.FC = () => {
   const navigation = useNavigation<MedicamentosScreenNavigationProp>();
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [disponibilidad, setDisponibilidad] = useState<Disponibilidad[]>([]);
+  const [favoritos, setFavoritos] = useState<number[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 6;
-
   const [search, setSearch] = useState("");
 
-  // Estados para alerta
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<AlertType>('info');
+  const [medicamentoEnProceso, setMedicamentoEnProceso] = useState<{id: number, nombre: string} | null>(null);
 
   const showAlert = (title: string, message: string, type: AlertType = 'info') => {
     setAlertTitle(title);
@@ -71,114 +53,54 @@ const MedicamentosScreen: React.FC = () => {
     setAlertVisible(true);
   };
 
-  const loadMedicamentos = useCallback(async () => {
+  // Toggle favorito
+  const toggleFavorito = async (medicamentoId: number, medicamentoNombre: string) => {
     try {
-      setLoading(true);
-      const medicamentosData = await MedicamentoPresenter.getAllMedicamentos();
-      const disponibilidadData = await MedicamentoPresenter.getDisponibilidad();
+      if (!currentUser) {
+        showAlert('Error', 'Debes iniciar sesión para usar favoritos', 'error');
+        return;
+      }
+
+      const esFavorito = favoritos.includes(medicamentoId);
       
-      setMedicamentos(medicamentosData);
-      setDisponibilidad(disponibilidadData);
+      if (esFavorito) {
+        await FavoritoPresenter.eliminarFavorito(medicamentoId);
+        setFavoritos(prev => prev.filter(id => id !== medicamentoId));
+        showAlert('Éxito', 'Medicamento eliminado de favoritos', 'success');
+      } else {
+        setAlertTitle('Agregar a Favoritos');
+        setAlertMessage(`¿Deseas agregar "${medicamentoNombre}" a favoritos? Recibirás un aviso cuando su stock esté disponible.`);
+        setAlertType('confirmation');
+        setMedicamentoEnProceso({ id: medicamentoId, nombre: medicamentoNombre });
+        setAlertVisible(true);
+      }
     } catch (error: any) {
       showAlert('Error', error.message, 'error');
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  };
 
-  const setupWebSockets = useCallback(async () => {
+  // Función para manejar la confirmación del AlertComponent
+  const handleConfirmarFavorito = async () => {
+    if (!medicamentoEnProceso) return;
+    
     try {
-      const medSocket = await initSocket();
-      
-      // Escuchar eventos de medicamentos
-      medSocket.on('medicamento_creado', (nuevoMedicamento: Medicamento) => {
-        setMedicamentos(prev => [...prev, nuevoMedicamento]);
-      });
-      
-      medSocket.on('medicamento_actualizado', (medicamentoActualizado: Medicamento) => {
-        setMedicamentos(prev => 
-          prev.map(med => 
-            med.id === medicamentoActualizado.id ? medicamentoActualizado : med
-          )
-        );
-      });
-      
-      medSocket.on('medicamento_eliminado', (data: { id: number }) => {
-        setMedicamentos(prev => prev.filter(med => med.id !== data.id));
-      });
-      
-      // Escuchar eventos de disponibilidad
-      medSocket.on('disponibilidad_creada', (nuevaDisponibilidad: Disponibilidad) => {
-        setDisponibilidad(prev => [...prev, nuevaDisponibilidad]);
-      });
-      
-      medSocket.on('disponibilidad_actualizada', (disponibilidadActualizada: Disponibilidad) => {
-        setDisponibilidad(prev => 
-          prev.map(disp => 
-            disp.id === disponibilidadActualizada.id ? disponibilidadActualizada : disp
-          )
-        );
-        // Actualizar también la lista de medicamentos para reflejar cambios de stock
-        loadMedicamentos();
-      });
-      
-      medSocket.on('disponibilidad_eliminada', (data: { id: number }) => {
-        setDisponibilidad(prev => prev.filter(disp => disp.id !== data.id));
-      });
-      
-      medSocket.on('stock_ajustado', () => {
-        // Actualizar la disponibilidad cuando se ajusta el stock
-        loadMedicamentos();
-      });
-      
-      medSocket.on('medicamento_consumido', () => {
-        // Actualizar la disponibilidad cuando se consume un medicamento
-        loadMedicamentos();
-      });
-      
-      medSocket.on('alerta_stock_bajo', (data: any) => {
-        showAlert('Stock Bajo', data.mensaje || `Stock bajo de ${data.medicamento} en ${data.sede}: ${data.stock_actual} unidades restantes`, 'warning');
-      });
-      
-      medSocket.on('error', (error: any) => {
-        console.log('Error de WebSocket:', error);
-      });
-      
-      return medSocket;
-    } catch (error) {
-      console.log('Error al configurar WebSockets:', error);
-      return null;
+      await FavoritoPresenter.agregarFavorito(medicamentoEnProceso.id);
+      setFavoritos(prev => [...prev, medicamentoEnProceso.id]);
+      setMedicamentoEnProceso(null);
+      setAlertVisible(false);
+      showAlert('Éxito', 'Medicamento agregado a favoritos', 'success');
+    } catch (error: any) {
+      showAlert('Error', error.message, 'error');
     }
-  }, [loadMedicamentos]);
+  };
 
-  useEffect(() => {
-    const initializeData = async () => {
-      await loadMedicamentos();
-      
-      // Configurar WebSockets después de cargar los datos
-      await setupWebSockets();
-    };
+  // Función para manejar la cancelación del AlertComponent
+  const handleCancelarFavorito = () => {
+    setMedicamentoEnProceso(null);
+    setAlertVisible(false);
+  };
 
-    initializeData();
-
-    // Cleanup al desmontar el componente
-    return () => {
-      if (socket) {
-        socket.off('medicamento_creado');
-        socket.off('medicamento_actualizado');
-        socket.off('medicamento_eliminado');
-        socket.off('disponibilidad_creada');
-        socket.off('disponibilidad_actualizada');
-        socket.off('disponibilidad_eliminada');
-        socket.off('stock_ajustado');
-        socket.off('medicamento_consumido');
-        socket.off('alerta_stock_bajo');
-        socket.off('error');
-      }
-    };
-  }, [loadMedicamentos, setupWebSockets]);
-
-  useEffect(() => {
+  // Cargar count del carrito
   const loadCarritoCount = async () => {
     try {
       const carritoStr = await AsyncStorage.getItem('carrito');
@@ -193,76 +115,159 @@ const MedicamentosScreen: React.FC = () => {
     }
   };
 
-  if (isFocused) {
+  // useEffect principal 
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        console.log('Cargando datos iniciales...');
+        setLoading(true);
+        
+        const user = await AuthPresenter.getCurrentUser();
+        setCurrentUser(user);
+        
+        const [medicamentosData, disponibilidadData] = await Promise.all([
+          MedicamentoPresenter.getAllMedicamentos(),
+          MedicamentoPresenter.getDisponibilidad()
+        ]);
+        
+        setMedicamentos(medicamentosData);
+        setDisponibilidad(disponibilidadData);
+        
+        if (user) {
+          try {
+            const favoritosData = await FavoritoPresenter.obtenerFavoritosUsuario();
+            const idsFavoritos = favoritosData.map(fav => fav.id_medicamento);
+            setFavoritos(idsFavoritos);
+          } catch (error) {
+            console.log('Error cargando favoritos:', error);
+          }
+        }
+        
+      } catch (error: any) {
+        console.log('Error en loadInitialData:', error);
+        showAlert('Error', 'No se pudieron cargar los medicamentos', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
     loadCarritoCount();
-  }
-}, [isFocused]);
+  }, []); 
 
-const getStockForMedicamento = (medicamentoId: number): number => {
-  const disponibilidadesMedicamento = disponibilidad.filter(d => d.id_medicamento === medicamentoId);
-  return disponibilidadesMedicamento.reduce((total, disp) => total + disp.stock, 0);
-};
+  // Efecto para recargar cuando la pantalla está enfocada
+  useEffect(() => {
+    if (isFocused) {
+      loadCarritoCount();
+      
+      const recargarEnFoco = async () => {
+        try {
+          const user = await AuthPresenter.getCurrentUser();
+          const [medicamentosData, disponibilidadData] = await Promise.all([
+            MedicamentoPresenter.getAllMedicamentos(),
+            MedicamentoPresenter.getDisponibilidad()
+          ]);
+          
+          setCurrentUser(user);
+          setMedicamentos(medicamentosData);
+          setDisponibilidad(disponibilidadData);
+          
+          if (user) {
+            const favoritosData = await FavoritoPresenter.obtenerFavoritosUsuario();
+            setFavoritos(favoritosData.map(fav => fav.id_medicamento));
+          }
+        } catch (error) {
+          console.log('Error recargando en foco:', error);
+        }
+      };
 
-const getEstadoForMedicamento = (medicamentoId: number): { text: string, color: string } => {
-  const stockTotal = getStockForMedicamento(medicamentoId);
-  
-  if (stockTotal === 0) return { text: "Agotado", color: "#ff6b6b" }; // rojo
-  if (stockTotal <= 10) return { text: "Poco stock", color: "#f6c23e" }; // amarillo
-  return { text: "Disponible", color: "#42d68c" }; // verde
-};
+      recargarEnFoco();
+    }
+  }, [isFocused]);
 
+  // Funciones auxiliares
+  const getStockForMedicamento = (medicamentoId: number): number => {
+    const disponibilidadesMedicamento = disponibilidad.filter(d => d.id_medicamento === medicamentoId);
+    return disponibilidadesMedicamento.reduce((total, disp) => total + disp.stock, 0);
+  };
 
-const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
-  const estado = getEstadoForMedicamento(item.id);
+  const getEstadoForMedicamento = (medicamentoId: number): { text: string, color: string } => {
+    const stockTotal = getStockForMedicamento(medicamentoId);
+    
+    if (stockTotal === 0) return { text: "Agotado", color: "#ff6b6b" };
+    if (stockTotal <= 10) return { text: "Poco stock", color: "#f6c23e" };
+    return { text: "Disponible", color: "#42d68c" };
+  };
 
-  return (
-    <TouchableOpacity 
-      style={styles.medicamentoCard}
-      onPress={() => navigation.navigate('Detail', { medicamentoId: item.id })}
-    >
-      {/* Encabezado */}
-      <View style={styles.medicamentoHeader}>
-        <Icon name="medkit" size={20} color="#42d68c" />
-        <Text style={styles.medicamentoName} numberOfLines={1}>
-          {item.nombreMedicamento}
-        </Text>
-        {/* Botón para ir a detalles */}
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Detail', { medicamentoId: item.id })}
-          style={styles.detailButton}
-        >
-          <Icon name="info-circle" size={20} color="#42d68c" />
-        </TouchableOpacity>
-      </View>
+  // Render item
+  const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
+    const estado = getEstadoForMedicamento(item.id);
+    const esFavorito = favoritos.includes(item.id);
 
-      {/* Cuerpo con texto e imagen */}
-      <View style={styles.medicamentoBody}>
-        <View style={styles.medicamentoInfo}>
-          <Text style={styles.detailText}>Tipo: {item.tipo}</Text>
-          <Text style={styles.detailText} numberOfLines={3}>
-            {item.descripcion}
+    return (
+      <TouchableOpacity 
+        style={styles.medicamentoCard}
+        onPress={() => navigation.navigate('Detail', { medicamentoId: item.id })}
+      >
+        <View style={styles.medicamentoHeader}>
+          <Icon name="medkit" size={20} color="#42d68c" />
+          <Text style={styles.medicamentoName} numberOfLines={1}>
+            {item.nombreMedicamento}
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: estado.color }]}>
-            <Text style={styles.statusText}>{estado.text}</Text>
-          </View>
+          
+          <TouchableOpacity 
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleFavorito(item.id, item.nombreMedicamento);
+            }}
+            style={styles.favoriteButton}
+          >
+            <Icon 
+              name={esFavorito ? "heart" : "heart-o"} 
+              size={20} 
+              color={esFavorito ? "#ff6b6b" : "#42d68c"} 
+            />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            onPress={(e) => {
+              e.stopPropagation();
+              navigation.navigate('Detail', { medicamentoId: item.id });
+            }}
+            style={styles.detailButton}
+          >
+            <Icon name="info-circle" size={20} color="#42d68c" />
+          </TouchableOpacity>
         </View>
 
-        {item.foto ? (
-          <Image
-            source={{ uri: `data:${item.tipo_mime};base64,${item.foto}` }}
-            style={styles.medicamentoImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.noImageBox}>
-            <Text style={styles.noImageText}>Sin imagen</Text>
+        <View style={styles.medicamentoBody}>
+          <View style={styles.medicamentoInfo}>
+            <Text style={styles.detailText}>Tipo: {item.tipo}</Text>
+            <Text style={styles.detailText} numberOfLines={3}>
+              {item.descripcion}
+            </Text>
+            <View style={[styles.statusBadge, { backgroundColor: estado.color }]}>
+              <Text style={styles.statusText}>{estado.text}</Text>
+            </View>
           </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-};
 
+          {item.foto ? (
+            <Image
+              source={{ uri: `data:${item.tipo_mime};base64,${item.foto}` }}
+              style={styles.medicamentoImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.noImageBox}>
+              <Text style={styles.noImageText}>Sin imagen</Text>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  // Filtrado y paginación
   const filteredMedicamentos = medicamentos.filter(m =>
     m.nombreMedicamento.toLowerCase().includes(search.toLowerCase()) ||
     m.referencia.toLowerCase().includes(search.toLowerCase())
@@ -274,6 +279,7 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
     (currentPage + 1) * itemsPerPage
   );
 
+  // Loading state
   if (loading) {
     return (
       <View style={styles.container}>
@@ -284,7 +290,6 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <LinearGradient
         colors={['#42d68c', '#239c64ff']}
         style={styles.header}
@@ -299,12 +304,11 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
         </TouchableOpacity>
         
         <View style={styles.titleContainer}>
-          <Icon name="medkit" size={30} color="white" style={styles.titleIcon} />
+          <Icon name="medkit" size={24} color="white" style={styles.titleIcon} />
           <Text style={styles.titleText}>Medicamentos</Text>
         </View>
       </LinearGradient>
       
-      {/* Filtro */}
       <View style={styles.searchContainer}>
         <Icon name="search" size={18} color="#999" style={styles.searchIcon} />
         <TextInput
@@ -315,7 +319,6 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
         />
       </View>
 
-      {/* Contenido con ScrollView */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {filteredMedicamentos.length === 0 ? (
           <View style={styles.emptyState}>
@@ -332,11 +335,10 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
               scrollEnabled={false} 
             />
             
-            {/* Paginación */}
             <View style={styles.pagination}>
               <TouchableOpacity 
                 style={[styles.paginationButton, currentPage === 0 && styles.paginationButtonDisabled]}
-                onPress={() => setCurrentPage(prev => prev - 1)}
+                onPress={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                 disabled={currentPage === 0}
               >
                 <Icon name="chevron-left" size={20} color={currentPage === 0 ? "#ccc" : "#42d68c"} />
@@ -348,7 +350,7 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
               
               <TouchableOpacity 
                 style={[styles.paginationButton, currentPage === totalPages - 1 && styles.paginationButtonDisabled]}
-                onPress={() => setCurrentPage(prev => prev + 1)}
+                onPress={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
                 disabled={currentPage === totalPages - 1}
               >
                 <Icon name="chevron-right" size={20} color={currentPage === totalPages - 1 ? "#ccc" : "#42d68c"} />
@@ -358,7 +360,6 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
         )}
       </ScrollView>
 
-      {/* Footer con margen superior */}
       <View style={styles.footer}>
         <Image 
           source={require('../../img/logo-green.png')} 
@@ -367,21 +368,34 @@ const renderMedicamentoItem = ({ item }: { item: Medicamento }) => {
         />
         
         <TouchableOpacity 
-  style={styles.boxButton}
-  onPress={() => navigation.navigate('Package')}
->
-  <Icon name="archive" size={20} color="white" />
-  {carritoCount > 0 && (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{carritoCount}</Text>
-    </View>
-  )}
-</TouchableOpacity>
+          style={styles.boxButton}
+          onPress={() => navigation.navigate('Package')}
+        >
+          <Icon name="archive" size={20} color="white" />
+          {carritoCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{carritoCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
-      {/* Alert */}
-      <Alert
-        visible={alertVisible}
+      {/* Alert para confirmación de favoritos */}
+      <AlertComponent
+        visible={alertVisible && alertType === 'confirmation'}
+        title={alertTitle}
+        message={alertMessage}
+        type="confirmation"
+        confirmText="Agregar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmarFavorito}
+        onCancel={handleCancelarFavorito}
+        onClose={handleCancelarFavorito}
+      />
+
+      {/* Alert para mensajes normales */}
+      <AlertComponent
+        visible={alertVisible && alertType !== 'confirmation'}
         title={alertTitle}
         message={alertMessage}
         type={alertType}
@@ -418,6 +432,10 @@ const styles = StyleSheet.create({
   backButton: { 
     marginRight: 15, 
     padding: 5 
+  },
+    favoriteButton: {
+    padding: 8,
+    marginRight: 8,
   },
   titleContainer: { 
     flexDirection: 'row', 

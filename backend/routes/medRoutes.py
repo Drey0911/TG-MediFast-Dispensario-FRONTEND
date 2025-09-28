@@ -14,7 +14,7 @@ def token_required(f):
             token = request.headers['Authorization'].split(" ")[1] if len(request.headers['Authorization'].split(" ")) > 1 else None
         
         if not token:
-            return jsonify({'error': 'Token es requerido'}), 401
+            return jsonify({'error': 'Su sesión expiró, inicie sesión de nuevo'}), 401
         
         # Importamos UserService aquí para evitar imports circulares
         from services.userService import UserService

@@ -180,6 +180,13 @@
                     Disponibilidad
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ url_for('admin_routes.recolecciones') }}" 
+                   class="nav-link {% if request.endpoint == 'admin_routes.recolecciones' or request.endpoint == 'admin_routes.add_recoleccion' or request.endpoint == 'admin_routes.edit_recoleccion' %}active{% endif %}">
+                    <i class="fas fa-calendar me-2"></i>
+                    Recolecciones
+                </a>
+            </li>
         </ul>
         
         <div class="mt-auto">

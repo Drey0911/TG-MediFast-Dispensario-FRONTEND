@@ -86,7 +86,6 @@ const HomeScreen: React.FC = () => {
         userSocket.on('usuario_actualizado', (updatedUser: User) => {
           if (updatedUser.id === currentUser.id) {
             setUser(updatedUser);
-            showAlert('Actualizacion', 'Tus datos han sido actualizados', 'warning');
           }
         });
         
@@ -136,25 +135,24 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  // Funciones para los botones
-  const handleMedifastPress = () => {
-    showAlert('MEDIFAST', 'Funcionalidad de MEDIFAST', 'success');
-  };
-
   const handleMedicamentosPress = () => {
     navigation.navigate('Medicamentos');
   };
 
-  const handleOption2Press = () => {
-    showAlert('Opción 2', 'Funcionalidad de Opción 2', 'success');
+  const handleRecoleccionesPress = () => {
+    navigation.navigate('Recolecciones');
   };
 
-  const handleOption3Press = () => {
-    showAlert('Opción 3', 'Funcionalidad de Opción 3', 'success');
+  const handleFavoritosPress = () => {
+    navigation.navigate('Favoritos');
   };
 
-  const handleOption4Press = () => {
-    showAlert('Opción 4', 'Funcionalidad de Opción 4', 'success');
+  const handleUserPress = () => {
+    navigation.navigate('User');
+  };
+
+  const handleHistorialPress = () => {
+  navigation.navigate('Historial');
   };
 
   if (loading) {
@@ -194,7 +192,7 @@ const HomeScreen: React.FC = () => {
                 colors={['#ffffffff', '#ecececff']}
                 titleColor="#4eb32fff" 
                 descriptionColor="#505050ff" 
-                onPress={handleMedifastPress}
+                onPress={handleRecoleccionesPress}
               />
               
               <ButtonModules
@@ -219,7 +217,7 @@ const HomeScreen: React.FC = () => {
                 colors={['#ffffffff', '#ecececff']}
                 titleColor="#b02121ff" 
                 descriptionColor="#505050ff"
-                onPress={handleOption2Press}
+                onPress={handleFavoritosPress}
               />
               
               <ButtonModules
@@ -230,7 +228,7 @@ const HomeScreen: React.FC = () => {
                 colors={['#ffffffff', '#ecececff']}
                 titleColor="#851072ff" 
                 descriptionColor="#505050ff"
-                onPress={handleOption3Press}
+                onPress={handleUserPress}
               />
             </View>
             
@@ -244,7 +242,7 @@ const HomeScreen: React.FC = () => {
                 colors={['#ffffffff', '#ecececff']}
                 titleColor="#e1c735ff" 
                 descriptionColor="#505050ff"
-                onPress={handleOption4Press}
+                onPress={handleHistorialPress}
               />
               
               <ButtonModules
@@ -326,7 +324,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   titleText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
   },

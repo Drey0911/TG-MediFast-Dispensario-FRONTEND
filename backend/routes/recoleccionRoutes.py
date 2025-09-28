@@ -14,7 +14,7 @@ def token_required(f):
             token = request.headers['Authorization'].split(" ")[1] if len(request.headers['Authorization'].split(" ")) > 1 else None
         
         if not token:
-            return jsonify({'error': 'Token es requerido'}), 401
+            return jsonify({'error': 'Su sesión expiró, inicie sesión de nuevo'}), 401
         
         # Importamos UserService aquí para evitar imports circulares
         from services.userService import UserService
@@ -39,18 +39,15 @@ def create_recoleccion_batch():
         if len(data) == 0:
             return jsonify({'error': 'La lista de recolecciones está vacía'}), 400
         
-        # Verificar que el usuario solo crea recolecciones para sí mismo
-        user_id = data[0].get('id_usuario')
-        if request.current_user.get('sub') != user_id and request.current_user.get('rol') != 'admin':
-            return jsonify({'error': 'No puedes crear recolecciones para otros usuarios'}), 403
+        # Validar que todas las recolecciones tengan id_sede
+        for rec in data:
+            if not rec.get('id_sede'):
+                return jsonify({'error': 'El campo id_sede es obligatorio para todas las recolecciones'}), 400
         
         recolecciones, error = RecoleccionService.create_recoleccion_batch(data)
         
         if error:
             return jsonify({'error': error}), 400
-        
-        # Emitir evento de WebSocket
-        socketio.emit('recolecciones_creadas', recolecciones, namespace='/')
         
         return jsonify(recolecciones), 201
         
@@ -70,20 +67,19 @@ def create_recoleccion():
         id_usuario = data.get('id_usuario')
         fecha_recoleccion = data.get('fechaRecoleccion')
         hora_recoleccion = data.get('horaRecoleccion')
+        id_sede = data.get('id_sede')  # Validar sede
         
         # Validar campos requeridos
-        if not all([id_medicamento, id_usuario, fecha_recoleccion, hora_recoleccion]):
-            return jsonify({'error': 'Todos los campos son requeridos'}), 400
-        
-        # Verificar que el usuario solo crea recolecciones para sí mismo
-        if request.current_user.get('sub') != id_usuario and request.current_user.get('rol') != 'admin':
-            return jsonify({'error': 'No puedes crear recolecciones para otros usuarios'}), 403
+        if not all([id_medicamento, id_usuario, fecha_recoleccion, hora_recoleccion, id_sede]):
+            return jsonify({'error': 'Todos los campos son requeridos, incluyendo id_sede'}), 400
         
         recoleccion, error = RecoleccionService.create_recoleccion(
             id_medicamento=id_medicamento,
             id_usuario=id_usuario,
             fecha_recoleccion=fecha_recoleccion,
-            hora_recoleccion=hora_recoleccion
+            hora_recoleccion=hora_recoleccion,
+            cantidad=data.get('cantidad', 1),
+            id_sede=id_sede
         )
         
         if error:
@@ -119,7 +115,7 @@ def get_recolecciones_by_usuario(usuario_id):
     """Obtener recolecciones de un usuario específico"""
     try:
         # Verificar que el usuario solo vea sus propias recolecciones
-        if request.current_user.get('sub') != usuario_id and request.current_user.get('rol') != 'admin':
+        if int(request.current_user.get('sub')) != usuario_id and request.current_user.get('rol') != 'admin':
             return jsonify({'error': 'No puedes ver las recolecciones de otros usuarios'}), 403
         
         recolecciones, error = RecoleccionService.get_recolecciones_by_usuario(usuario_id)
@@ -139,7 +135,7 @@ def get_recoleccion(recoleccion_id):
             return jsonify({'error': error}), 404
         
         # Verificar que el usuario solo vea sus propias recolecciones
-        if request.current_user.get('sub') != recoleccion['id_usuario'] and request.current_user.get('rol') != 'admin':
+        if int(request.current_user.get('sub')) != recoleccion['id_usuario'] and request.current_user.get('rol') != 'admin':
             return jsonify({'error': 'No puedes ver esta recolección'}), 403
         
         return jsonify(recoleccion), 200
@@ -151,11 +147,13 @@ def get_recoleccion(recoleccion_id):
 def get_recolecciones_by_estado(estado):
     """Obtener recolecciones por estado"""
     try:
-        # Verificar que el usuario sea admin
-        if request.current_user.get('rol') != 'admin':
-            return jsonify({'error': 'Acceso denegado. Se requieren permisos de administrador'}), 403
-        
-        recolecciones, error = RecoleccionService.get_recolecciones_by_estado(estado)
+        if request.current_user.get('rol') == 'admin':
+            # Admin puede ver todas las recolecciones con ese estado
+            recolecciones, error = RecoleccionService.get_recolecciones_by_estado(estado)
+        else:
+            # Usuario solo puede ver sus propias recolecciones con ese estado
+            usuario_id = int(request.current_user.get('sub'))
+            recolecciones, error = RecoleccionService.get_recolecciones_by_estado_y_usuario(estado, usuario_id)
         if error:
             return jsonify({'error': error}), 400
         return jsonify(recolecciones), 200
@@ -177,7 +175,7 @@ def update_recoleccion(recoleccion_id):
             return jsonify({'error': error}), 404
         
         # Verificar que el usuario solo actualice sus propias recolecciones
-        if request.current_user.get('sub') != recoleccion_actual['id_usuario'] and request.current_user.get('rol') != 'admin':
+        if int(request.current_user.get('sub')) != recoleccion_actual['id_usuario'] and request.current_user.get('rol') != 'admin':
             return jsonify({'error': 'No puedes actualizar esta recolección'}), 403
         
         recoleccion, error = RecoleccionService.update_recoleccion(recoleccion_id, data)
@@ -191,28 +189,34 @@ def update_recoleccion(recoleccion_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@recoleccion_routes.route('/recolecciones/<int:recoleccion_id>', methods=['DELETE'])
+@recoleccion_routes.route('/recolecciones/<int:recoleccion_id>/cancelar', methods=['POST'])
 @token_required
-def delete_recoleccion(recoleccion_id):
-    """Eliminar recolección"""
+def cancelar_recoleccion(recoleccion_id):
+    """Cancelar una recolección (soft delete)"""
     try:
         # Obtener recolección para verificar permisos
         recoleccion, error = RecoleccionService.get_recoleccion_by_id(recoleccion_id)
         if error:
             return jsonify({'error': error}), 404
         
-        # Verificar que el usuario solo elimine sus propias recolecciones
-        if request.current_user.get('sub') != recoleccion['id_usuario'] and request.current_user.get('rol') != 'admin':
-            return jsonify({'error': 'No puedes eliminar esta recolección'}), 403
+        # Verificar que el usuario solo cancele sus propias recolecciones
+        if int(request.current_user.get('sub')) != recoleccion['id_usuario'] and request.current_user.get('rol') != 'admin':
+            return jsonify({'error': 'No puedes cancelar esta recolección'}), 403
         
-        success, error = RecoleccionService.delete_recoleccion(recoleccion_id)
+        # Actualizar el estado a 4 (CANCELADA) con un softdelete
+        success, error = RecoleccionService.update_recoleccion(recoleccion_id, {'cumplimiento': 4})
         if error:
             return jsonify({'error': error}), 400
         
-        # Emitir evento de WebSocket cuando se elimina una recolección
-        socketio.emit('recoleccion_eliminada', {'id': recoleccion_id}, namespace='/')
+        # Obtener la recolección actualizada para emitir
+        recoleccion_actualizada, error = RecoleccionService.get_recoleccion_by_id(recoleccion_id)
+        if error:
+            return jsonify({'error': error}), 404
         
-        return jsonify({'message': 'Recolección eliminada correctamente'}), 200
+        # Emitir evento de WebSocket cuando se cancela una recolección
+        socketio.emit('recoleccion_cancelada', recoleccion_actualizada, namespace='/')
+        
+        return jsonify({'message': 'Recolección cancelada correctamente', 'recoleccion': recoleccion_actualizada}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

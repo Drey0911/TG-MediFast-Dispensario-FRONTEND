@@ -14,7 +14,7 @@ def token_required(f):
             token = request.headers['Authorization'].split(" ")[1] if len(request.headers['Authorization'].split(" ")) > 1 else None
         
         if not token:
-            return jsonify({'error': 'Token es requerido'}), 401
+            return jsonify({'error': 'Su sesión expiró, inicie sesión de nuevo'}), 401
         
         user_data, error = UserService.verify_jwt(token)
         if error:
@@ -51,6 +51,23 @@ def register():
         socketio.emit('usuario_creado', user, namespace='/')
         
         return jsonify({'user': user, 'token': token}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@user_routes.route('/recover-password', methods=['POST'])
+def recover_password():
+    try:
+        data = request.get_json()
+        
+        if not all(key in data for key in ['dni', 'telefono']):
+            return jsonify({'error': 'DNI y teléfono son requeridos'}), 400
+        
+        result, error = UserService.recover_password(data['dni'], data['telefono'])
+        
+        if error:
+            return jsonify({'error': error}), 400
+        
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

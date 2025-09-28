@@ -4,6 +4,7 @@ from models.medModel import Medicamentos
 from models.sedeModel import Sede
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
+from services.notificationService import NotificationService
 
 class DispService:
     
@@ -50,6 +51,13 @@ class DispService:
             
             db.session.add(nueva_disponibilidad)
             db.session.commit()
+            
+            # NOTIFICACIÓN: Cuando se CREA con stock > 0 (stock anterior era 0 por defecto)
+            if stock > 0:
+                print(f"Creando nueva disponibilidad con stock {stock} - Notificando...")
+                NotificationService.verificar_y_notificar_cambio_stock(
+                    nueva_disponibilidad.id, 0, stock  # Stock anterior: 0, Stock nuevo: stock
+                )
             
             # Recargar con relaciones
             disponibilidad_completa = Disponibilidad.query.options(
@@ -130,6 +138,8 @@ class DispService:
             if not disponibilidad:
                 return None, "Disponibilidad no encontrada"
             
+            stock_anterior = disponibilidad.stock
+            
             # Actualizar campos
             if 'stock' in data:
                 stock = int(data['stock'])
@@ -148,6 +158,13 @@ class DispService:
                 disponibilidad.estado = data['estado']
             
             db.session.commit()
+            
+            # NOTIFICACIÓN: Verificar si cambió de 0 a >0 (solo si se modificó el stock)
+            if 'stock' in data:
+                print(f"Actualizando stock: Anterior {stock_anterior}, Nuevo {disponibilidad.stock}")
+                NotificationService.verificar_y_notificar_cambio_stock(
+                    disponibilidad_id, stock_anterior, disponibilidad.stock
+                )
             
             # Recargar con relaciones
             disponibilidad_actualizada = Disponibilidad.query.options(
@@ -300,6 +317,7 @@ class DispService:
             if not disponibilidad:
                 return None, "Disponibilidad no encontrada"
             
+            stock_anterior = disponibilidad.stock
             nuevo_stock = max(0, disponibilidad.stock + cantidad)
             
             # Auto-ajustar estado basado en nuevo stock
@@ -314,6 +332,12 @@ class DispService:
             disponibilidad.estado = nuevo_estado
             
             db.session.commit()
+            
+            # NOTIFICACIÓN: Verificar si cambió de 0 a >0
+            print(f"Ajustando stock: Anterior {stock_anterior}, Ajuste {cantidad}, Nuevo {nuevo_stock}")
+            NotificationService.verificar_y_notificar_cambio_stock(
+                disponibilidad_id, stock_anterior, nuevo_stock
+            )
             
             # Recargar con relaciones
             disponibilidad_actualizada = Disponibilidad.query.options(

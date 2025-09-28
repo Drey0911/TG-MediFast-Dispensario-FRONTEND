@@ -30,6 +30,29 @@ export class RecoleccionPresenter {
     }
   }
 
+    static async getRecoleccionesByUsuarioAndEstado(usuarioId: number, estado: number): Promise<any[]> {
+    try {
+      const response = await api.get(`/recolecciones/usuario/${usuarioId}`);
+      
+      if (response.data && Array.isArray(response.data)) {
+        // Filtrar por estado
+        return response.data.filter((recoleccion: any) => recoleccion.cumplimiento === estado);
+      }
+      
+      return [];
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Error al obtener recolecciones');
+    }
+  }
+
+static async cancelarRecoleccion(id: number): Promise<void> {
+  try {
+    await api.post(`/recolecciones/${id}/cancelar`);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || 'Error al cancelar recolección');
+  }
+}
+
   static async getRecoleccionById(id: number): Promise<Recoleccion> {
     try {
       const response = await api.get(`/recolecciones/${id}`);
@@ -54,14 +77,6 @@ export class RecoleccionPresenter {
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Error al actualizar recolección');
-    }
-  }
-
-  static async deleteRecoleccion(id: number): Promise<void> {
-    try {
-      await api.delete(`/recolecciones/${id}`);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Error al eliminar recolección');
     }
   }
 

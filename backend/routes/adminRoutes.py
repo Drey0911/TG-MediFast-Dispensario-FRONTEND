@@ -2,6 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from services.userService import UserService
 from services.sedeService import SedeService
 from services.medService import MedService
+from services.recoleccionService import RecoleccionService
+from services.userService import UserService
+from services.medService import MedService
+from services.recoleccionService import RecoleccionService
+from services.dispService import DispService
 from functools import wraps
 from socketsExtends import socketio  
 
@@ -659,91 +664,6 @@ def delete_disponibilidad(disponibilidad_id):
     
     return redirect(url_for('admin_routes.disponibilidad'))
 
-@admin_routes.route('/disponibilidad/<int:disponibilidad_id>/view')
-@admin_required
-def view_disponibilidad(disponibilidad_id):
-    from services.dispService import DispService
-    
-    disponibilidad, error = DispService.get_disponibilidad_by_id(disponibilidad_id)
-    if error:
-        flash(f'Disponibilidad no encontrada: {error}', 'error')
-        return redirect(url_for('admin_routes.disponibilidad'))
-    
-    return render_template('admin/disponibilidad/view_disponibilidad.html', 
-                         disponibilidad=disponibilidad)
-
-@admin_routes.route('/disponibilidad/sede/<int:sede_id>')
-@admin_required
-def disponibilidad_by_sede(sede_id):
-    from services.dispService import DispService
-    from services.sedeService import SedeService
-    
-    # Obtener información de la sede
-    sede, error = SedeService.get_sede_by_id(sede_id)
-    if error:
-        flash(f'Sede no encontrada: {error}', 'error')
-        return redirect(url_for('admin_routes.disponibilidad'))
-    
-    # Obtener disponibilidades de la sede
-    disponibilidades, error = DispService.get_disponibilidad_by_sede(sede_id)
-    if error:
-        flash(f'Error al cargar disponibilidades de la sede: {error}', 'error')
-        disponibilidades = []
-    
-    return render_template('admin/disponibilidad/disponibilidad_by_sede.html', 
-                         disponibilidades=disponibilidades, 
-                         sede=sede)
-
-@admin_routes.route('/disponibilidad/medicamento/<int:medicamento_id>')
-@admin_required
-def disponibilidad_by_medicamento(medicamento_id):
-    from services.dispService import DispService
-    from services.medService import MedService
-    
-    # Obtener información del medicamento
-    medicamento, error = MedService.get_medicamento_by_id(medicamento_id)
-    if error:
-        flash(f'Medicamento no encontrado: {error}', 'error')
-        return redirect(url_for('admin_routes.disponibilidad'))
-    
-    # Obtener disponibilidades del medicamento
-    disponibilidades, error = DispService.get_disponibilidad_by_medicamento(medicamento_id)
-    if error:
-        flash(f'Error al cargar disponibilidades del medicamento: {error}', 'error')
-        disponibilidades = []
-    
-    return render_template('admin/disponibilidad/disponibilidad_by_medicamento.html', 
-                         disponibilidades=disponibilidades, 
-                         medicamento=medicamento)
-
-@admin_routes.route('/disponibilidad/stock-bajo')
-@admin_required
-def stock_bajo():
-    from services.dispService import DispService
-    
-    # Obtener disponibilidades con stock bajo (<=10 unidades)
-    disponibilidades, error = DispService.get_disponibilidad_stock_bajo(10)
-    if error:
-        flash(f'Error al cargar disponibilidades con stock bajo: {error}', 'error')
-        disponibilidades = []
-    
-    return render_template('admin/disponibilidad/stock_bajo.html', 
-                         disponibilidades=disponibilidades)
-
-@admin_routes.route('/disponibilidad/agotados')
-@admin_required
-def medicamentos_agotados():
-    from services.dispService import DispService
-    
-    # Obtener disponibilidades agotadas (stock = 0)
-    disponibilidades, error = DispService.get_disponibilidad_agotadas()
-    if error:
-        flash(f'Error al cargar medicamentos agotados: {error}', 'error')
-        disponibilidades = []
-    
-    return render_template('admin/disponibilidad/agotados.html', 
-                         disponibilidades=disponibilidades)
-
 @admin_routes.route('/disponibilidad/bulk-update', methods=['POST'])
 @admin_required
 def bulk_update_disponibilidad():
@@ -814,3 +734,321 @@ def bulk_update_disponibilidad():
             flash(error, 'error')
     
     return redirect(url_for('admin_routes.disponibilidad'))
+
+# ------------------------------------------------------------------------------
+# Rutas para RECOLECCIONES
+# ------------------------------------------------------------------------------
+
+@admin_routes.route('/recolecciones')
+@admin_required
+def recolecciones():
+    
+    # Obtener filtros de la URL
+    estado_filter = request.args.get('estado_filter', '')
+    usuario_filter = request.args.get('usuario_filter', '')
+    medicamento_search = request.args.get('medicamento_search', '')
+    fecha_filter = request.args.get('fecha_filter', '')
+    norecoleccion_filter = request.args.get('norecoleccion_filter', '')
+    
+    # Obtener todas las recolecciones
+    recolecciones, error = RecoleccionService.get_all_recolecciones()
+    if error:
+        flash(f'Error al cargar recolecciones: {error}', 'error')
+        recolecciones = []
+    
+    # Agrupar por NoRecoleccion
+    recolecciones_agrupadas = {}
+    for rec in recolecciones:
+        if rec['NoRecoleccion'] not in recolecciones_agrupadas:
+            recolecciones_agrupadas[rec['NoRecoleccion']] = {
+                'recolecciones': [],
+                'usuario': rec['usuario'],
+                'fechaRecoleccion': rec['fechaRecoleccion'],
+                'horaRecoleccion': rec['horaRecoleccion'],
+                'horaVencimiento': rec['horaVencimiento'],
+                'cumplimiento': rec['cumplimiento']
+            }
+        recolecciones_agrupadas[rec['NoRecoleccion']]['recolecciones'].append(rec)
+    
+    # Aplicar filtros
+    if recolecciones_agrupadas:
+        if estado_filter:
+            estado_bool = True if estado_filter == '1' else False if estado_filter == '0' else None
+            if estado_bool is not None:
+                recolecciones_agrupadas = {k: v for k, v in recolecciones_agrupadas.items() 
+                                         if v['cumplimiento'] == estado_bool}
+        
+        if usuario_filter:
+            recolecciones_agrupadas = {k: v for k, v in recolecciones_agrupadas.items() 
+                                     if v['usuario']['id'] == int(usuario_filter)}
+        
+        if medicamento_search:
+            medicamento_search_lower = medicamento_search.lower()
+            recolecciones_agrupadas = {k: v for k, v in recolecciones_agrupadas.items() 
+                                     if any(medicamento_search_lower in r['medicamento']['nombreMedicamento'].lower() 
+                                            for r in v['recolecciones'])}
+        
+        if fecha_filter:
+            recolecciones_agrupadas = {k: v for k, v in recolecciones_agrupadas.items() 
+                                     if v['fechaRecoleccion'] == fecha_filter}
+        
+        if norecoleccion_filter:
+            recolecciones_agrupadas = {k: v for k, v in recolecciones_agrupadas.items() 
+                                     if norecoleccion_filter.lower() in k.lower()}
+    
+    # Obtener usuarios y medicamentos para los filtros
+    usuarios, error = UserService.get_all_users()
+    if error:
+        flash(f'Error al cargar usuarios: {error}', 'error')
+        usuarios = []
+    
+    medicamentos, error = MedService.get_all_medicamentos()
+    if error:
+        flash(f'Error al cargar medicamentos: {error}', 'error')
+        medicamentos = []
+    
+    return render_template('admin/recolecciones/recolecciones.html', 
+                         recolecciones_agrupadas=recolecciones_agrupadas, 
+                         usuarios=usuarios,
+                         medicamentos=medicamentos)
+
+@admin_routes.route('/recolecciones/<string:norecoleccion>/edit', methods=['GET', 'POST'])
+@admin_required
+def edit_recoleccion(norecoleccion):
+    # Obtener todas las recolecciones con este NoRecoleccion
+    recolecciones, error = RecoleccionService.get_recolecciones_by_norecoleccion(norecoleccion)
+    if error or not recolecciones:
+        flash(f'Recolecciones no encontradas: {error}', 'error')
+        return redirect(url_for('admin_routes.recolecciones'))
+    
+    if request.method == 'POST':
+        cumplimiento = request.form.get('cumplimiento')
+        
+        if cumplimiento is None:
+            flash('El campo de cumplimiento es requerido', 'error')
+            return render_template('admin/recolecciones/edit_recoleccion.html', 
+                                   recolecciones=recolecciones,
+                                   norecoleccion=norecoleccion)
+        
+        try:
+            nuevo_cumplimiento = int(cumplimiento)
+            data = {'cumplimiento': nuevo_cumplimiento}
+            
+            # Actualizar todas las recolecciones con este NoRecoleccion
+            updated_count = 0
+            for rec in recolecciones:
+                updated_rec, error = RecoleccionService.update_recoleccion(rec['id'], data)
+                if updated_rec:
+                    updated_count += 1
+                    socketio.emit('recoleccion_actualizada', updated_rec, namespace='/')
+            
+            if updated_count > 0:
+                flash(f'{updated_count} recolección(es) actualizada(s) correctamente', 'success')
+                return redirect(url_for('admin_routes.recolecciones'))
+            else:
+                flash('Error al actualizar las recolecciones', 'error')
+                return render_template('admin/recolecciones/edit_recoleccion.html', 
+                                       recolecciones=recolecciones,
+                                       norecoleccion=norecoleccion)
+        except ValueError as e:
+            flash(f'Error en los datos proporcionados: {str(e)}', 'error')
+            return render_template('admin/recolecciones/edit_recoleccion.html', 
+                                   recolecciones=recolecciones,
+                                   norecoleccion=norecoleccion)
+        except Exception as e:
+            flash(f'Error inesperado: {str(e)}', 'error')
+            return render_template('admin/recolecciones/edit_recoleccion.html', 
+                                   recolecciones=recolecciones,
+                                   norecoleccion=norecoleccion)
+    
+    # GET request
+    return render_template('admin/recolecciones/edit_recoleccion.html', 
+                           recolecciones=recolecciones,
+                           norecoleccion=norecoleccion)
+
+@admin_routes.route('/recolecciones/<string:norecoleccion>/delete', methods=['POST'])
+@admin_required
+def delete_recoleccion(norecoleccion):
+    from services.recoleccionService import RecoleccionService
+    from services.dispService import DispService
+    
+    # Obtener todas las recolecciones con este NoRecoleccion
+    recolecciones, error = RecoleccionService.get_recolecciones_by_norecoleccion(norecoleccion)
+    if error or not recolecciones:
+        flash(f'Recolecciones no encontradas: {error}', 'error')
+        return redirect(url_for('admin_routes.recolecciones'))
+    
+    deleted_count = 0
+    errors = []
+    
+    for rec in recolecciones:
+        # Si la recolección no estaba cumplida, devolver el stock
+        if not rec['cumplimiento'] or rec['cumplimiento'] == 2:
+            disponibilidades, error = DispService.get_disponibilidad_by_medicamento(rec['id_medicamento'])
+            if not error and disponibilidades:
+                # Encontrar la primera disponibilidad con stock
+                for disp in disponibilidades:
+                    nuevo_stock = disp['stock'] + rec['cantidad']
+                    nuevo_estado = 'agotado' if nuevo_stock == 0 else ('poco_stock' if nuevo_stock <= 10 else 'disponible')
+                    
+                    data = {
+                        'stock': nuevo_stock,
+                        'estado': nuevo_estado
+                    }
+                    
+                    updated_disp, error = DispService.update_disponibilidad(disp['id'], data)
+                    if updated_disp:
+                        # Emitir evento de WebSocket para actualización de disponibilidad
+                        socketio.emit('disponibilidad_actualizada', updated_disp, namespace='/')
+                    break
+        
+        success, error = RecoleccionService.delete_recoleccion(rec['id'])
+        if success:
+            deleted_count += 1
+            # Emitir evento de WebSocket cuando se elimina recolección
+            socketio.emit('recoleccion_eliminada', {'id': rec['id']}, namespace='/')
+        else:
+            errors.append(f'Error eliminando recolección ID {rec["id"]}: {error}')
+    
+    if deleted_count > 0:
+        flash(f'{deleted_count} recolección(es) eliminada(s) correctamente', 'success')
+    
+    if errors:
+        for error in errors:
+            flash(error, 'error')
+    
+    return redirect(url_for('admin_routes.recolecciones'))
+
+@admin_routes.route('/recolecciones/<string:norecoleccion>/view')
+@admin_required
+def view_recoleccion(norecoleccion):
+    from services.recoleccionService import RecoleccionService
+    
+    # Obtener todas las recolecciones con este NoRecoleccion
+    recolecciones, error = RecoleccionService.get_recolecciones_by_norecoleccion(norecoleccion)
+    if error or not recolecciones:
+        flash(f'Recolecciones no encontradas: {error}', 'error')
+        return redirect(url_for('admin_routes.recolecciones'))
+    
+    return render_template('admin/recolecciones/view_recoleccion.html', 
+                         recolecciones=recolecciones,
+                         norecoleccion=norecoleccion)
+
+@admin_routes.route('/recolecciones/usuario/<int:usuario_id>')
+@admin_required
+def recolecciones_by_usuario(usuario_id):
+    from services.recoleccionService import RecoleccionService
+    from services.userService import UserService
+    
+    # Obtener información del usuario
+    usuario, error = UserService.get_user_by_id(usuario_id)
+    if error:
+        flash(f'Usuario no encontrado: {error}', 'error')
+        return redirect(url_for('admin_routes.recolecciones'))
+    
+    # Obtener recolecciones del usuario
+    recolecciones, error = RecoleccionService.get_recolecciones_by_usuario(usuario_id)
+    if error:
+        flash(f'Error al cargar recolecciones del usuario: {error}', 'error')
+        recolecciones = []
+    
+    # Agrupar por NoRecoleccion
+    recolecciones_agrupadas = {}
+    for rec in recolecciones:
+        if rec['NoRecoleccion'] not in recolecciones_agrupadas:
+            recolecciones_agrupadas[rec['NoRecoleccion']] = {
+                'recolecciones': [],
+                'usuario': rec['usuario'],
+                'fechaRecoleccion': rec['fechaRecoleccion'],
+                'horaRecoleccion': rec['horaRecoleccion'],
+                'horaVencimiento': rec['horaVencimiento'],
+                'cumplimiento': rec['cumplimiento']
+            }
+        recolecciones_agrupadas[rec['NoRecoleccion']]['recolecciones'].append(rec)
+    
+    return render_template('admin/recolecciones/recolecciones_by_usuario.html', 
+                         recolecciones_agrupadas=recolecciones_agrupadas, 
+                         usuario=usuario)
+
+@admin_routes.route('/recolecciones/pendientes')
+@admin_required
+def recolecciones_pendientes():
+    
+    # Obtener recolecciones pendientes (cumplimiento = 0)
+    recolecciones, error = RecoleccionService.get_recolecciones_by_estado(0)
+    if error:
+        flash(f'Error al cargar recolecciones pendientes: {error}', 'error')
+        recolecciones = []
+    
+    # Agrupar por NoRecoleccion
+    recolecciones_agrupadas = {}
+    for rec in recolecciones:
+        if rec['NoRecoleccion'] not in recolecciones_agrupadas:
+            recolecciones_agrupadas[rec['NoRecoleccion']] = {
+                'recolecciones': [],
+                'usuario': rec['usuario'],
+                'fechaRecoleccion': rec['fechaRecoleccion'],
+                'horaRecoleccion': rec['horaRecoleccion'],
+                'horaVencimiento': rec['horaVencimiento'],
+                'cumplimiento': rec['cumplimiento']
+            }
+        recolecciones_agrupadas[rec['NoRecoleccion']]['recolecciones'].append(rec)
+    
+    return render_template('admin/recolecciones/pendientes.html', 
+                         recolecciones_agrupadas=recolecciones_agrupadas)
+
+@admin_routes.route('/recolecciones/cumplidas')
+@admin_required
+def recolecciones_cumplidas():
+    from services.recoleccionService import RecoleccionService
+    
+    # Obtener recolecciones cumplidas (cumplimiento = 1)
+    recolecciones, error = RecoleccionService.get_recolecciones_by_estado(1)
+    if error:
+        flash(f'Error al cargar recolecciones cumplidas: {error}', 'error')
+        recolecciones = []
+    
+    # Agrupar por NoRecoleccion
+    recolecciones_agrupadas = {}
+    for rec in recolecciones:
+        if rec['NoRecoleccion'] not in recolecciones_agrupadas:
+            recolecciones_agrupadas[rec['NoRecoleccion']] = {
+                'recolecciones': [],
+                'usuario': rec['usuario'],
+                'fechaRecoleccion': rec['fechaRecoleccion'],
+                'horaRecoleccion': rec['horaRecoleccion'],
+                'horaVencimiento': rec['horaVencimiento'],
+                'cumplimiento': rec['cumplimiento']
+            }
+        recolecciones_agrupadas[rec['NoRecoleccion']]['recolecciones'].append(rec)
+    
+    return render_template('admin/recolecciones/cumplidas.html', 
+                         recolecciones_agrupadas=recolecciones_agrupadas)
+
+@admin_routes.route('/recolecciones/vencidas')
+@admin_required
+def recolecciones_vencidas():
+    from services.recoleccionService import RecoleccionService
+    
+    # Obtener recolecciones vencidas (cumplimiento = 2)
+    recolecciones, error = RecoleccionService.get_recolecciones_by_estado(2)
+    if error:
+        flash(f'Error al cargar recolecciones vencidas: {error}', 'error')
+        recolecciones = []
+    
+    # Agrupar por NoRecoleccion
+    recolecciones_agrupadas = {}
+    for rec in recolecciones:
+        if rec['NoRecoleccion'] not in recolecciones_agrupadas:
+            recolecciones_agrupadas[rec['NoRecoleccion']] = {
+                'recolecciones': [],
+                'usuario': rec['usuario'],
+                'fechaRecoleccion': rec['fechaRecoleccion'],
+                'horaRecoleccion': rec['horaRecoleccion'],
+                'horaVencimiento': rec['horaVencimiento'],
+                'cumplimiento': rec['cumplimiento']
+            }
+        recolecciones_agrupadas[rec['NoRecoleccion']]['recolecciones'].append(rec)
+    
+    return render_template('admin/recolecciones/vencidas.html', 
+                         recolecciones_agrupadas=recolecciones_agrupadas)

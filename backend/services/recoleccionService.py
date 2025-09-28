@@ -13,13 +13,16 @@ class RecoleccionService:
         Crea múltiples recolecciones con el mismo NoRecoleccion
         """
         try:
-            # Verificar que todas las recolecciones tengan la misma fecha y hora
+            # Validar que todas las recolecciones tengan la misma fecha, hora y sede
             primera_fecha = recolecciones_data[0]['fechaRecoleccion']
             primera_hora = recolecciones_data[0]['horaRecoleccion']
+            primera_sede = recolecciones_data[0]['id_sede']
             
             for rec in recolecciones_data:
-                if rec['fechaRecoleccion'] != primera_fecha or rec['horaRecoleccion'] != primera_hora:
-                    return None, "Todas las recolecciones deben tener la misma fecha y hora"
+                if (rec['fechaRecoleccion'] != primera_fecha or 
+                    rec['horaRecoleccion'] != primera_hora or 
+                    rec['id_sede'] != primera_sede):
+                    return None, "Todas las recolecciones deben tener la misma fecha, hora y sede"
             
             # Validar fecha y hora (deben ser futuras)
             fecha_obj = datetime.strptime(primera_fecha, '%Y-%m-%d').date()
@@ -45,19 +48,20 @@ class RecoleccionService:
                 # Verificar stock disponible
                 disponibilidad = Disponibilidad.query.filter_by(
                     id_medicamento=rec_data['id_medicamento'],
-                    id_sede=rec_data.get('id_sede')  # Asumiendo que tienes sede en los datos
+                    id_sede=rec_data['id_sede']
                 ).first()
                 
                 if not disponibilidad:
-                    return None, f"No hay disponibilidad para el medicamento {rec_data['id_medicamento']}"
+                    return None, f"No hay disponibilidad para el medicamento {rec_data['id_medicamento']} en la sede {rec_data['id_sede']}"
                 
                 if disponibilidad.stock < rec_data['cantidad']:
-                    return None, f"Stock insuficiente para el medicamento {rec_data['id_medicamento']}. Stock actual: {disponibilidad.stock}"
+                    return None, f"Stock insuficiente para el medicamento {rec_data['id_medicamento']} en la sede {rec_data['id_sede']}. Stock actual: {disponibilidad.stock}"
                 
                 # Crear nueva recolección
                 nueva_recoleccion = Recoleccion(
                     id_medicamento=rec_data['id_medicamento'],
                     id_usuario=rec_data['id_usuario'],
+                    id_sede=rec_data['id_sede'],
                     NoRecoleccion=no_recoleccion,
                     fechaRecoleccion=fecha_obj,
                     horaRecoleccion=hora_obj,
@@ -77,7 +81,7 @@ class RecoleccionService:
                 
                 db.session.add(nueva_recoleccion)
                 nuevas_recolecciones.append(nueva_recoleccion)
-            
+        
             db.session.commit()
             
             # Recargar con relaciones
@@ -85,12 +89,12 @@ class RecoleccionService:
             for rec in nuevas_recolecciones:
                 rec_completa = Recoleccion.query.options(
                     joinedload(Recoleccion.medicamento),
-                    joinedload(Recoleccion.usuario)
+                    joinedload(Recoleccion.usuario),
+                    joinedload(Recoleccion.sede)
                 ).get(rec.id)
                 recolecciones_completas.append(rec_completa.to_dict())
-            
+        
             return recolecciones_completas, None
-            
         except ValueError:
             return None, "Formato de fecha u hora inválido"
         except SQLAlchemyError as e:
@@ -124,18 +128,39 @@ class RecoleccionService:
             while Recoleccion.query.filter_by(NoRecoleccion=no_recoleccion).first():
                 no_recoleccion = Recoleccion.generate_no_recoleccion()
             
+            # Verificar stock disponible
+            disponibilidad = Disponibilidad.query.filter_by(
+                id_medicamento=id_medicamento,
+                id_sede=id_sede
+            ).first()
+            
+            if not disponibilidad:
+                return None, f"No hay disponibilidad para el medicamento {id_medicamento} en la sede {id_sede}"
+            
+            if disponibilidad.stock < cantidad:
+                return None, f"Stock insuficiente para el medicamento {id_medicamento} en la sede {id_sede}. Stock actual: {disponibilidad.stock}"
+            
             # Crear nueva recolección
             nueva_recoleccion = Recoleccion(
                 id_medicamento=id_medicamento,
                 id_usuario=id_usuario,
+                id_sede=id_sede,  # Asignar sede
                 NoRecoleccion=no_recoleccion,
                 fechaRecoleccion=fecha_obj,
                 horaRecoleccion=hora_obj,
                 horaVencimiento=hora_vencimiento,
                 cantidad=cantidad,
-                cumplimiento=0,
-                id_sede=id_sede
+                cumplimiento=0
             )
+            
+            # Actualizar stock
+            disponibilidad.stock -= cantidad
+            if disponibilidad.stock == 0:
+                disponibilidad.estado = 'agotado'
+            elif disponibilidad.stock <= 10:
+                disponibilidad.estado = 'poco_stock'
+            else:
+                disponibilidad.estado = 'disponible'
             
             db.session.add(nueva_recoleccion)
             db.session.commit()
@@ -143,11 +168,12 @@ class RecoleccionService:
             # Recargar con relaciones
             recoleccion_completa = Recoleccion.query.options(
                 joinedload(Recoleccion.medicamento),
-                joinedload(Recoleccion.usuario)
+                joinedload(Recoleccion.usuario),
+                joinedload(Recoleccion.medicamento.sede)
             ).get(nueva_recoleccion.id)
             
             return recoleccion_completa.to_dict(), None
-            
+        
         except ValueError:
             return None, "Formato de fecha u hora inválido"
         except SQLAlchemyError as e:
@@ -165,7 +191,8 @@ class RecoleccionService:
         try:
             recolecciones = Recoleccion.query.options(
                 joinedload(Recoleccion.medicamento),
-                joinedload(Recoleccion.usuario)
+                joinedload(Recoleccion.usuario),
+                joinedload(Recoleccion.sede)
             ).all()
             
             return [rec.to_dict() for rec in recolecciones], None
@@ -183,7 +210,8 @@ class RecoleccionService:
         try:
             recoleccion = Recoleccion.query.options(
                 joinedload(Recoleccion.medicamento),
-                joinedload(Recoleccion.usuario)
+                joinedload(Recoleccion.usuario),
+                joinedload(Recoleccion.sede)
             ).get(recoleccion_id)
             
             if not recoleccion:
@@ -204,7 +232,8 @@ class RecoleccionService:
         try:
             recolecciones = Recoleccion.query.options(
                 joinedload(Recoleccion.medicamento),
-                joinedload(Recoleccion.usuario)
+                joinedload(Recoleccion.usuario),
+                joinedload(Recoleccion.sede)
             ).filter_by(id_usuario=usuario_id).all()
             
             return [rec.to_dict() for rec in recolecciones], None
@@ -222,7 +251,8 @@ class RecoleccionService:
         try:
             recolecciones = Recoleccion.query.options(
                 joinedload(Recoleccion.medicamento),
-                joinedload(Recoleccion.usuario)
+                joinedload(Recoleccion.usuario),
+                joinedload(Recoleccion.sede)
             ).filter_by(cumplimiento=estado).all()
             
             return [rec.to_dict() for rec in recolecciones], None
@@ -242,7 +272,24 @@ class RecoleccionService:
             if not recoleccion:
                 return None, "Recolección no encontrada"
             
-            # Actualizar campos
+            # Verificar si el estado cambia a cancelado (estado = 3)
+            if 'cumplimiento' in data and data['cumplimiento'] == 3 and recoleccion.cumplimiento != 3:
+                # Devolver el stock a la disponibilidad
+                disponibilidad = Disponibilidad.query.filter_by(
+                    id_medicamento=recoleccion.id_medicamento,
+                    id_sede=recoleccion.id_sede
+                ).first()
+                
+                if disponibilidad:
+                    disponibilidad.stock += recoleccion.cantidad
+                    if disponibilidad.stock == 0:
+                        disponibilidad.estado = 'agotado'
+                    elif disponibilidad.stock <= 10:
+                        disponibilidad.estado = 'poco_stock'
+                    else:
+                        disponibilidad.estado = 'disponible'
+            
+            # Actualizar los campos de la recolección
             if 'fechaRecoleccion' in data:
                 recoleccion.fechaRecoleccion = datetime.strptime(data['fechaRecoleccion'], '%Y-%m-%d').date()
             
@@ -263,7 +310,6 @@ class RecoleccionService:
             ).get(recoleccion_id)
             
             return recoleccion_actualizada.to_dict(), None
-            
         except ValueError:
             return None, "Formato de fecha u hora inválido"
         except SQLAlchemyError as e:
@@ -327,3 +373,41 @@ class RecoleccionService:
         except Exception as e:
             db.session.rollback()
             return 0, f"Error inesperado: {str(e)}"
+    
+    @staticmethod
+    def get_recolecciones_by_norecoleccion(norecoleccion):
+        """
+        Obtiene todas las recolecciones asociadas a un NoRecoleccion específico.
+        """
+        try:
+            recolecciones = Recoleccion.query.options(
+                joinedload(Recoleccion.medicamento),
+                joinedload(Recoleccion.usuario)
+            ).filter_by(NoRecoleccion=norecoleccion).all()
+            
+            if not recolecciones:
+                return None, "No se encontraron recolecciones con el número proporcionado"
+            
+            # Agregar información de la sede desde la tabla Disponibilidad
+            recolecciones_completas = []
+            for rec in recolecciones:
+                disponibilidad = Disponibilidad.query.filter_by(
+                    id_medicamento=rec.id_medicamento,
+                    id_sede=rec.id_sede
+                ).first()
+                
+                sede_info = {
+                    'id': disponibilidad.sede.id,
+                    'nombreSede': disponibilidad.sede.nombreSede,
+                    'ubicacion': disponibilidad.sede.ubicacion
+                } if disponibilidad and disponibilidad.sede else None
+                
+                rec_dict = rec.to_dict()
+                rec_dict['sede'] = sede_info
+                recolecciones_completas.append(rec_dict)
+            
+            return recolecciones_completas, None
+        except SQLAlchemyError as e:
+            return None, f"Error de base de datos: {str(e)}"
+        except Exception as e:
+            return None, f"Error inesperado: {str(e)}"

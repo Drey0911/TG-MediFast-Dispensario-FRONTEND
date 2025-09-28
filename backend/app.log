@@ -1,0 +1,261 @@
+2025-09-24 20:29:29,133 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-09-24 20:29:29,133 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-24 20:29:29,134 - INFO -  * Restarting with stat
+2025-09-24 20:29:31,140 - WARNING -  * Debugger is active!
+2025-09-24 20:29:31,149 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:30:37,472 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:37] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:30:37,570 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:37] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:30:39,409 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:39] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:30:39,458 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:39] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:30:39,501 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:39] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:30:47,033 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:47] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:30:47,066 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:47] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:30:49,822 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:49] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:30:49,872 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:49] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:30:49,919 - INFO - 192.168.1.51 - - [24/Sep/2025 20:30:49] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:29,546 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:29] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:32:29,591 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:29] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:31,502 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:31] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:32:31,550 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:31] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:32:31,598 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:31] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:36,716 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:36] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:32:36,744 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:36] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:38,040 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:38] "GET /recolecciones HTTP/1.1" 200 -
+2025-09-24 20:32:38,082 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:38] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:38,508 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:38] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:32:38,551 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:38] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:39,958 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:39] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:32:40,003 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:40] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:32:42,839 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:42] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:32:42,897 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:42] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:32:42,980 - INFO - 192.168.1.51 - - [24/Sep/2025 20:32:42] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:33:38,513 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\dispService.py', reloading
+2025-09-24 20:33:38,773 - INFO -  * Restarting with stat
+2025-09-24 20:33:41,195 - WARNING -  * Debugger is active!
+2025-09-24 20:33:41,205 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:34:00,789 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:00] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:34:00,878 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:00] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:34:02,731 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:02] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:34:02,807 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:02] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:34:02,860 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:02] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:34:04,824 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:04] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:34:04,864 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:04] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:34:07,136 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:07] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:34:07,190 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:07] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:34:07,241 - INFO - 192.168.1.51 - - [24/Sep/2025 20:34:07] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:35:55,383 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\StockNotificationService.py', reloading
+2025-09-24 20:35:55,658 - INFO -  * Restarting with stat
+2025-09-24 20:38:03,314 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-09-24 20:38:03,314 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-24 20:38:03,315 - INFO -  * Restarting with stat
+2025-09-24 20:38:04,664 - WARNING -  * Debugger is active!
+2025-09-24 20:38:04,671 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:38:04,749 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:04] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:38:04,837 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:04] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:38:08,234 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:08] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:38:08,289 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:08] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:38:08,342 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:08] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:38:13,562 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:13] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:38:13,603 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:13] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:38:15,657 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 20:38:15,657 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 20:38:15,657 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 20:38:15,660 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 20:38:15,661 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 20:38:15,661 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 20:38:15,664 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 20:38:15,664 - ERROR - Error notificando usuarios: 'WhatsAppService' object has no attribute 'get_user_phone'
+2025-09-24 20:38:15,664 - INFO - Proceso completado. Notificados: 0 usuarios
+2025-09-24 20:38:15,668 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:15] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:38:15,710 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:15] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:38:15,766 - INFO - 192.168.1.51 - - [24/Sep/2025 20:38:15] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:38:45,121 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:38:45,360 - INFO -  * Restarting with stat
+2025-09-24 20:39:49,956 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-09-24 20:39:49,957 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-24 20:39:49,958 - INFO -  * Restarting with stat
+2025-09-24 20:39:51,622 - WARNING -  * Debugger is active!
+2025-09-24 20:39:51,632 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:39:51,766 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:51] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:39:51,906 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:51] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:39:54,227 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:54] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:39:54,283 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:54] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:39:54,360 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:54] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:39:56,917 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:56] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:39:57,013 - INFO - 192.168.1.51 - - [24/Sep/2025 20:39:57] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:39:59,246 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 20:39:59,247 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 20:39:59,247 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 20:39:59,251 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 20:39:59,251 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 20:39:59,251 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 20:39:59,254 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 20:39:59,259 - INFO - Telefono obtenido para usuario 1: 573222514185
+2025-09-24 20:40:01,567 - INFO - Notificacion enviada a usuario 1
+2025-09-24 20:40:01,568 - INFO - Notificaciones enviadas: 1/1 usuarios
+2025-09-24 20:40:01,568 - INFO - Proceso completado. Notificados: 1 usuarios
+2025-09-24 20:40:01,572 - INFO - 192.168.1.51 - - [24/Sep/2025 20:40:01] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:40:01,649 - INFO - 192.168.1.51 - - [24/Sep/2025 20:40:01] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:40:01,720 - INFO - 192.168.1.51 - - [24/Sep/2025 20:40:01] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:41:39,796 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:41:40,103 - INFO -  * Restarting with stat
+2025-09-24 20:41:41,798 - WARNING -  * Debugger is active!
+2025-09-24 20:41:41,803 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:42:29,238 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:42:29,449 - INFO -  * Restarting with stat
+2025-09-24 20:42:31,298 - WARNING -  * Debugger is active!
+2025-09-24 20:42:31,304 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:45:49,190 - INFO - 192.168.1.51 - - [24/Sep/2025 20:45:49] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:45:49,284 - INFO - 192.168.1.51 - - [24/Sep/2025 20:45:49] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:51:01,141 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:51:01,464 - INFO -  * Restarting with stat
+2025-09-24 20:52:40,185 - WARNING -  * Debugger is active!
+2025-09-24 20:52:40,190 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:52:45,269 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\dispService.py', reloading
+2025-09-24 20:52:47,342 - WARNING -  * Debugger is active!
+2025-09-24 20:52:47,348 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:53:00,424 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:00] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:53:00,523 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:00] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:53:02,297 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:02] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:53:02,366 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:02] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:53:02,418 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:02] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:53:03,272 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:03] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:53:03,316 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:03] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:53:04,871 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 20:53:04,872 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 20:53:04,872 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 20:53:04,875 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 20:53:04,875 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 20:53:04,876 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 20:53:04,879 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 20:53:04,883 - INFO - Telefono obtenido para usuario 1: 573222514185
+2025-09-24 20:53:04,884 - INFO - Intentando enviar mensaje WhatsApp a 573222514185
+2025-09-24 20:53:06,226 - INFO - Mensaje WhatsApp enviado a 573222514185
+2025-09-24 20:53:06,230 - INFO - Notificacion enviada a usuario 1
+2025-09-24 20:53:06,231 - INFO - Notificaciones enviadas: 1/1 usuarios
+2025-09-24 20:53:06,232 - INFO - Proceso completado. Notificados: 1 usuarios
+2025-09-24 20:53:06,237 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:06] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:53:06,306 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:06] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:53:06,366 - INFO - 192.168.1.51 - - [24/Sep/2025 20:53:06] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:54:32,345 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:56:03,315 - WARNING -  * Debugger is active!
+2025-09-24 20:56:03,320 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 20:56:07,847 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:07] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:56:07,940 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:07] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:56:09,878 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:09] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:56:09,948 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:09] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:56:10,004 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:10] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:56:15,268 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:15] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 20:56:15,316 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:15] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:56:17,520 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 20:56:17,520 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 20:56:17,520 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 20:56:17,523 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 20:56:17,524 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 20:56:17,524 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 20:56:17,528 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 20:56:19,372 - INFO - Mensaje WhatsApp enviado a 573222514185
+2025-09-24 20:56:19,376 - INFO - Notificacion enviada a usuario 1
+2025-09-24 20:56:19,377 - INFO - Notificaciones enviadas: 1/1 usuarios
+2025-09-24 20:56:19,377 - INFO - Proceso completado. Notificados: 1 usuarios
+2025-09-24 20:56:19,379 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:19] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 20:56:19,428 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:19] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 20:56:19,482 - INFO - 192.168.1.51 - - [24/Sep/2025 20:56:19] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 20:58:59,957 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 20:59:04,324 - WARNING -  * Debugger is active!
+2025-09-24 20:59:04,329 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 21:04:21,272 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 21:04:23,326 - WARNING -  * Debugger is active!
+2025-09-24 21:04:23,331 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 21:04:28,559 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:28] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:04:28,712 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:28] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:04:30,979 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:30] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:04:31,076 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:31] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:04:31,150 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:31] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:04:35,054 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:35] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:04:35,102 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:35] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:04:37,131 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 21:04:37,131 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 21:04:37,131 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 21:04:37,136 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 21:04:37,136 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 21:04:37,137 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 21:04:37,141 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 21:04:39,053 - INFO - Notificacion enviada a usuario 1
+2025-09-24 21:04:39,053 - INFO - Notificaciones enviadas: 1/1 usuarios
+2025-09-24 21:04:39,054 - INFO - Proceso completado. Notificados: 1 usuarios
+2025-09-24 21:04:39,057 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:39] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:04:39,123 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:39] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:04:39,226 - INFO - 192.168.1.51 - - [24/Sep/2025 21:04:39] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:08:19,525 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 21:08:21,777 - WARNING -  * Debugger is active!
+2025-09-24 21:08:21,784 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 21:09:33,455 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\StockNotificationService.py', reloading
+2025-09-24 21:09:35,514 - WARNING -  * Debugger is active!
+2025-09-24 21:09:35,522 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 21:09:44,911 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:44] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:09:45,025 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:45] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:09:46,835 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:46] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:09:46,886 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:46] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:09:46,946 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:46] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:09:49,435 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:49] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:09:49,496 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:49] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:09:52,087 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 21:09:52,087 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 21:09:52,088 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 21:09:52,093 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 21:09:52,093 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 21:09:52,094 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 21:09:52,099 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 21:09:53,923 - ERROR - Error WhatsApp API: (#132001) Template name does not exist in the translation
+2025-09-24 21:09:53,928 - ERROR - Error enviando notificacion a usuario 1
+2025-09-24 21:09:53,929 - INFO - Intentando con plantilla alternativa...
+2025-09-24 21:09:55,258 - ERROR - Error enviando plantilla: {"error":{"message":"(#132001) Template name does not exist in the translation","type":"OAuthException","code":132001,"error_data":{"messaging_product":"whatsapp","details":"template name (hello_world) does not exist in es"},"fbtrace_id":"A6i-rLauaKKG-NEU79bNG7f"}}
+2025-09-24 21:09:55,262 - INFO - Notificaciones enviadas: 0/1 usuarios
+2025-09-24 21:09:55,262 - INFO - Proceso completado. Notificados: 0 usuarios
+2025-09-24 21:09:55,266 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:55] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:09:55,328 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:55] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:09:55,409 - INFO - 192.168.1.51 - - [24/Sep/2025 21:09:55] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:14:37,902 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.51:5000
+2025-09-24 21:14:37,903 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-24 21:14:37,904 - INFO -  * Restarting with stat
+2025-09-24 21:14:40,057 - WARNING -  * Debugger is active!
+2025-09-24 21:14:40,067 - INFO -  * Debugger PIN: 116-335-311
+2025-09-24 21:14:40,263 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:40] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:14:40,484 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:40] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:14:43,321 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:43] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:14:43,407 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:43] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:14:43,471 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:43] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:14:44,949 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:44] "GET /disponibilidad/1/edit HTTP/1.1" 200 -
+2025-09-24 21:14:45,011 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:45] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:14:47,020 - INFO - Stock cambiado de 0 a 50 para medicamento 1 en sede 1
+2025-09-24 21:14:47,021 - INFO - Procesando actualizacion de stock para Paracetamol  (ID: 1)
+2025-09-24 21:14:47,021 - INFO - Verificando cambio de stock para medicamento 1, sede 1
+2025-09-24 21:14:47,025 - INFO - Sede específica - Stock actual: 50, Tiene stock: True
+2025-09-24 21:14:47,026 - INFO - ¡Stock cambiado! Notificando usuarios...
+2025-09-24 21:14:47,026 - INFO - Buscando usuarios con favorito para medicamento 1
+2025-09-24 21:14:47,031 - INFO - Encontrados 1 usuarios con favorito
+2025-09-24 21:14:47,036 - INFO - Intentando mensaje normal para usuario 1
+2025-09-24 21:14:48,621 - INFO - Mensaje enviado a 573222514185
+2025-09-24 21:14:48,624 - INFO - Notificacion enviada a usuario 1
+2025-09-24 21:14:48,625 - INFO - Notificaciones enviadas: 1/1 usuarios
+2025-09-24 21:14:48,625 - INFO - Proceso completado. Notificados: 1 usuarios
+2025-09-24 21:14:48,628 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:48] "[32mPOST /disponibilidad/1/edit HTTP/1.1[0m" 302 -
+2025-09-24 21:14:48,693 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:48] "GET /disponibilidad HTTP/1.1" 200 -
+2025-09-24 21:14:48,771 - INFO - 192.168.1.51 - - [24/Sep/2025 21:14:48] "[36mGET /static/img/logo-green.png HTTP/1.1[0m" 304 -
+2025-09-24 21:20:03,126 - INFO -  * Detected change in 'C:\\Users\\USUARIO\\Desktop\\MediFast\\backend\\services\\whatsappService.py', reloading
+2025-09-24 21:20:03,414 - INFO -  * Restarting with stat
+2025-09-24 21:26:32,358 - INFO -  * Restarting with stat
+2025-09-24 21:26:43,652 - INFO -  * Restarting with stat

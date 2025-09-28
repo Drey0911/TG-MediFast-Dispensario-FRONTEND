@@ -1,0 +1,257 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Recolecciones - Admin{% endblock %}
+{% block page_title %}Gestión de Recolecciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-1">
+                <i class="fas fa-pills me-2 text-primary"></i>
+                Lista de Recolecciones
+            </h4>
+            <p class="text-muted mb-0">Administra todas las recolecciones del sistema agrupadas por número de recolección</p>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="estado_filter" class="form-label">Estado</label>
+                            <select class="form-select" id="estado_filter" name="estado_filter">
+                                <option value="">Todos los estados</option>
+                                <option value="1" {% if estado_filter == '1' %}selected{% endif %}>Cumplidas</option>
+                                <option value="0" {% if estado_filter == '0' %}selected{% endif %}>Pendientes</option>
+                                <option value="2" {% if estado_filter == '2' %}selected{% endif %}>Vencidas</option>
+                                <option value="4" {% if estado_filter == '4' %}selected{% endif %}>Canceladas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="usuario_filter" class="form-label">Usuario</label>
+                            <select class="form-select" id="usuario_filter" name="usuario_filter">
+                                <option value="">Todos los usuarios</option>
+                                {% for usuario in usuarios %}
+                                <option value="{{ usuario.id }}" {% if usuario_filter == usuario.id|string %}selected{% endif %}>
+                                    {{ usuario.nombre }} {{ usuario.apellido }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="norecoleccion_filter" class="form-label">No. Recolección</label>
+                            <input type="text" class="form-control" id="norecoleccion_filter" name="norecoleccion_filter" 
+                                   placeholder="Buscar número..." value="{{ norecoleccion_filter }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="fecha_filter" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha_filter" name="fecha_filter" 
+                                   value="{{ fecha_filter }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="medicamento_search" class="form-label">Medicamento</label>
+                            <input type="text" class="form-control" id="medicamento_search" name="medicamento_search" 
+                                   placeholder="Buscar medicamento..." value="{{ medicamento_search }}">
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i>
+                                Filtrar
+                            </button>
+                            <a href="{{ url_for('admin_routes.recolecciones') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Limpiar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recolecciones Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-table me-2"></i>
+                        Total: {{ recolecciones_agrupadas|length }} recolección{{ 'es' if recolecciones_agrupadas|length != 1 else '' }} agrupadas
+                    </h6>
+                    <div>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar recolecciones..." style="width: 250px;">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if recolecciones_agrupadas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="recoleccionesTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No. Recolección</th>
+                                    <th class="text-center">Usuario</th>
+                                    <th class="text-center">Medicamentos</th>
+                                    <th class="text-center">Fecha</th>
+                                    <th class="text-center">Hora</th>
+                                    <th class="text-center">Total Items</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for norecoleccion, grupo in recolecciones_agrupadas.items() %}
+                                <tr>
+                                    <td>
+                                        <div class="text-center">
+                                            <span class="fw-bold text-primary">{{ norecoleccion }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">{{ grupo.usuario.nombre }} {{ grupo.usuario.apellido }}</div>
+                                                <small class="text-muted">{{ grupo.usuario.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% for rec in grupo.recolecciones %}
+                                        <div class="d-flex align-items-center mb-1">
+                                            <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 30px; height: 30px;">
+                                                <i class="fas fa-pills text-info" style="font-size: 0.8rem;"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium small">{{ rec.medicamento.nombreMedicamento }}</div>
+                                                <small class="text-muted">Cant: {{ rec.cantidad }}</small>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-calendar me-1 text-muted"></i>{{ grupo.fechaRecoleccion }}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-clock me-1 text-muted"></i>{{ grupo.horaRecoleccion }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ grupo.recolecciones|length }}</span>
+                                    </td>
+                                    <td>
+                                        {% if grupo.cumplimiento == 1 %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Cumplida
+                                        </span>
+                                        {% elif grupo.cumplimiento == 3 %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i>Vencida
+                                        </span>
+                                        {% elif grupo.cumplimiento == 4 %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>Cancelada
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Pendiente
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            {% if grupo.cumplimiento != 3 %}
+                                            <a href="{{ url_for('admin_routes.edit_recoleccion', norecoleccion=norecoleccion) }}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% endif %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger" 
+                                                    title="Eliminar"
+                                                    onclick="confirmDelete('{{ norecoleccion }}', '{{ grupo.usuario.nombre }} {{ grupo.usuario.apellido }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay recolecciones registradas</h5>
+                        <p class="text-muted mb-3">No se encontraron recolecciones con los filtros aplicados</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">¿Estás seguro de que deseas eliminar la recolección de <strong id="deleteRecName"></strong>?</p>
+                <small class="text-muted">Esta acción eliminará la recolección actual, mas no devolvera el stock, si desea devolver el stock, primero marque la recolección como vencida.</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Función de búsqueda
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const tableRows = document.querySelectorAll('#recoleccionesTable tbody tr');
+    
+    tableRows.forEach(function(row) {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Función para confirmar eliminación
+function confirmDelete(norecoleccion, userName) {
+    document.getElementById('deleteRecName').textContent = userName + ' (' + norecoleccion + ')';
+    document.getElementById('deleteForm').action = `/recolecciones/${norecoleccion}/delete`;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+}
+</script>
+{% endblock %}

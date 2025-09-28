@@ -83,104 +83,104 @@ const DetailScreen: React.FC = () => {
     );
   }
 
-  const handleAddToPackage = async () => {
-    if (!selectedSede || !medicamento) {
-      showAlert('Error', 'Debe seleccionar una sede', 'error');
-      return;
-    }
+const handleAddToPackage = async () => {
+  if (!selectedSede || !medicamento) {
+    showAlert('Error', 'Debe seleccionar una sede', 'error');
+    return;
+  }
 
-    const cantidadNum = parseInt(cantidad, 10);
-    if (isNaN(cantidadNum) || cantidadNum <= 0) {
-      showAlert('Error', 'La cantidad debe ser un número válido mayor a 0', 'error');
-      return;
-    }
+  const cantidadNum = parseInt(cantidad, 10);
+  if (isNaN(cantidadNum) || cantidadNum <= 0) {
+    showAlert('Error', 'La cantidad debe ser un número válido mayor a 0', 'error');
+    return;
+  }
 
+  try {
+    let carrito: RecoleccionCarrito[] = [];
+    
     try {
-      let carrito: RecoleccionCarrito[] = [];
-      
-      try {
-        const carritoStr = await AsyncStorage.getItem('carrito');
-        if (carritoStr) {
-          carrito = JSON.parse(carritoStr);
-        }
-      } catch (error) {
-        console.log('⚠️ Carrito corrupto, limpiando...');
-        await AsyncStorage.removeItem('carrito');
-        carrito = [];
+      const carritoStr = await AsyncStorage.getItem('carrito');
+      if (carritoStr) {
+        carrito = JSON.parse(carritoStr);
       }
-      
-      // Verificar si ya hay medicamentos de otra sede en el carrito
-      if (carrito.length > 0) {
-        const primeraSedeId = carrito[0].sedeId;
-        if (primeraSedeId !== selectedSede.id) {
-          showAlert(
-            'Advertencia', 
-            'No puedes agregar medicamentos de diferentes sedes en la misma recolección. ¿Deseas vaciar el carrito y agregar este medicamento?',
-            'warning'
-          );
-          return;
-        }
-      }
-
-      const disponibilidadSeleccionada = disponibilidades.find(d => d.id_sede === selectedSede.id);
-      if (!disponibilidadSeleccionada) {
-        showAlert('Error', 'No se encontró la disponibilidad seleccionada', 'error');
-        return;
-      }
-
-      // Verificar stock disponible
-      if (cantidadNum > disponibilidadSeleccionada.stock) {
-        showAlert('Error', `Stock insuficiente. Máximo disponible: ${disponibilidadSeleccionada.stock}`, 'error');
-        return;
-      }
-
-      // Verificar si el medicamento ya está en el carrito
-      const existingIndex = carrito.findIndex(
-        item => item.medicamentoId === medicamento.id && item.sedeId === selectedSede.id
-      );
-
-      if (existingIndex !== -1) {
-        // Actualizar cantidad si ya existe
-        const nuevaCantidad = carrito[existingIndex].cantidad + cantidadNum;
-        if (nuevaCantidad > disponibilidadSeleccionada.stock) {
-          showAlert('Error', `No puedes agregar más. Máximo disponible: ${disponibilidadSeleccionada.stock}`, 'error');
-          return;
-        }
-        carrito[existingIndex].cantidad = nuevaCantidad;
-      } else {
-        // Agregar nuevo item al carrito
-        carrito.push({
-          medicamentoId: medicamento.id,
-          medicamentoNombre: medicamento.nombreMedicamento,
-          sedeId: selectedSede.id,
-          sedeNombre: selectedSede.nombreSede,
-          stock: disponibilidadSeleccionada.stock,
-          estado: disponibilidadSeleccionada.estado,
-          fechaRecoleccion: '',
-          horaRecoleccion: '',
-          cantidad: cantidadNum,
-          maxCantidad: disponibilidadSeleccionada.stock
-        });
-      }
-
-      // Guardar
-      try {
-        await AsyncStorage.setItem('carrito', JSON.stringify(carrito));
-        showAlert('Éxito', 'Medicamento agregado al paquete', 'success');
-        // Navegar a PackageScreen después de mostrar la alerta
-        setTimeout(() => {
-          navigation.navigate('Package');
-        }, 1500);
-      } catch (saveError) {
-        console.error('Error al guardar carrito:', saveError);
-        showAlert('Error', 'No se pudo guardar en el paquete', 'error');
-      }
-      
-    } catch (error: any) {
-      console.error('Error inesperado en handleAddToPackage:', error);
-      showAlert('Error', 'Ocurrió un error inesperado', 'error');
+    } catch (error) {
+      console.log('⚠️ Carrito corrupto, limpiando...');
+      await AsyncStorage.removeItem('carrito');
+      carrito = [];
     }
-  };
+    
+    // Verificar si ya hay medicamentos de otra sede en el carrito
+    if (carrito.length > 0) {
+      const primeraSedeId = carrito[0].sedeId;
+      if (primeraSedeId !== selectedSede.id) {
+        showAlert(
+          'Advertencia', 
+          'No puedes agregar medicamentos de diferentes sedes en la misma recolección.',
+          'warning'
+        );
+        return;
+      }
+    }
+
+    const disponibilidadSeleccionada = disponibilidades.find(d => d.id_sede === selectedSede.id);
+    if (!disponibilidadSeleccionada) {
+      showAlert('Error', 'No se encontró la disponibilidad seleccionada', 'error');
+      return;
+    }
+
+    // Verificar stock disponible
+    if (cantidadNum > disponibilidadSeleccionada.stock) {
+      showAlert('Error', `Stock insuficiente. Máximo disponible: ${disponibilidadSeleccionada.stock}`, 'error');
+      return;
+    }
+
+    // Verificar si el medicamento ya está en el carrito
+    const existingIndex = carrito.findIndex(
+      item => item.medicamentoId === medicamento.id && item.sedeId === selectedSede.id
+    );
+
+    if (existingIndex !== -1) {
+      // Actualizar cantidad si ya existe
+      const nuevaCantidad = carrito[existingIndex].cantidad + cantidadNum;
+      if (nuevaCantidad > disponibilidadSeleccionada.stock) {
+        showAlert('Error', `No puedes agregar más. Máximo disponible: ${disponibilidadSeleccionada.stock}`, 'error');
+        return;
+      }
+      carrito[existingIndex].cantidad = nuevaCantidad;
+    } else {
+      // Agregar nuevo item al carrito
+      carrito.push({
+        medicamentoId: medicamento.id,
+        medicamentoNombre: medicamento.nombreMedicamento,
+        sedeId: selectedSede.id, 
+        sedeNombre: selectedSede.nombreSede,
+        stock: disponibilidadSeleccionada.stock,
+        estado: disponibilidadSeleccionada.estado,
+        fechaRecoleccion: '',
+        horaRecoleccion: '',
+        cantidad: cantidadNum,
+        maxCantidad: disponibilidadSeleccionada.stock
+      });
+    }
+
+    // Guardar
+    try {
+      await AsyncStorage.setItem('carrito', JSON.stringify(carrito));
+      showAlert('Éxito', 'Medicamento agregado al paquete', 'success');
+      // Navegar a PackageScreen después de mostrar la alerta
+      setTimeout(() => {
+        navigation.navigate('Package');
+      }, 1500);
+    } catch (saveError) {
+      console.error('Error al guardar carrito:', saveError);
+      showAlert('Error', 'No se pudo guardar en el paquete', 'error');
+    }
+    
+  } catch (error: any) {
+    console.error('Error inesperado en handleAddToPackage:', error);
+    showAlert('Error', 'Ocurrió un error inesperado', 'error');
+  }
+};
 
   const handleCantidadChange = (text: string) => {
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -208,7 +208,7 @@ const DetailScreen: React.FC = () => {
         </TouchableOpacity>
         
         <View style={styles.titleContainer}>
-          <Icon name="info" size={30} color="white" style={styles.titleIcon} />
+          <Icon name="info" size={24} color="white" style={styles.titleIcon} />
           <Text style={styles.titleText}>Detalles del Medicamento</Text>
         </View>
       </LinearGradient>
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     marginRight: 10 
   },
   titleText: { 
-    fontSize: 18, 
+    fontSize: 24, 
     fontWeight: 'bold', 
     color: 'white' 
   },

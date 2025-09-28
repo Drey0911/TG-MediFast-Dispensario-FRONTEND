@@ -2,6 +2,7 @@ export interface Recoleccion {
   id: number;
   id_medicamento: number;
   id_usuario: number;
+  id_sede: number;
   NoRecoleccion: string;
   fechaRecoleccion: string;
   horaRecoleccion: string;
@@ -10,6 +11,29 @@ export interface Recoleccion {
   cumplimiento: number; 
   medicamento: any | null;
   usuario: any | null;
+   sede?: { 
+    id: number;
+    nombreSede: string;
+    ubicacion: string;
+  };
+}
+
+export interface RecoleccionAgrupada {
+  NoRecoleccion: string;
+  fechaRecoleccion: string;
+  horaRecoleccion: string;
+  horaVencimiento: string;
+  cumplimiento: number;
+  sede: {
+    id: number;
+    nombreSede: string;
+    ubicacion: string;
+  };
+  medicamentos: {
+    id: number;
+    nombre: string;
+    cantidad: number;
+  }[];
 }
 
 export interface RecoleccionCreate {

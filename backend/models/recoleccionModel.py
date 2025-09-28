@@ -13,17 +13,20 @@ class Recoleccion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_medicamento = db.Column(db.Integer, ForeignKey('medicamentos.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    id_sede = db.Column(db.Integer, ForeignKey('sedes.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     NoRecoleccion = db.Column(db.String(50), nullable=False)
     fechaRecoleccion = db.Column(db.Date, nullable=False)
     horaRecoleccion = db.Column(db.Time, nullable=False)
     horaVencimiento = db.Column(db.Time, nullable=False)
     cantidad = db.Column(db.Integer, nullable=False, default=1) 
-    cumplimiento = db.Column(db.Boolean, nullable=False, default=0)
+    cumplimiento = db.Column(db.Integer, nullable=False, default=0)
+    notificado = db.Column(db.Integer, nullable=True, default=0)
     
     # Relaciones
     medicamento = relationship('Medicamentos', backref=db.backref('recoleccion', cascade='all, delete-orphan', lazy='dynamic'))
     usuario = relationship('User', backref=db.backref('recoleccion', cascade='all, delete-orphan', lazy='dynamic')) 
-    
+    sede = relationship('Sede', backref=db.backref('recoleccion', cascade='all, delete-orphan', lazy='dynamic'))
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -35,17 +38,30 @@ class Recoleccion(db.Model):
             'horaVencimiento': self.horaVencimiento.isoformat() if self.horaVencimiento else None,
             'cantidad': self.cantidad,
             'cumplimiento': self.cumplimiento,
+            'notificado': self.notificado,
             # Datos relacionados
             'medicamento': self.medicamento.to_dict() if hasattr(self.medicamento, 'to_dict') and self.medicamento else None,
-            'usuario': self.usuario.to_dict() if hasattr(self.usuario, 'to_dict') and self.usuario else None
+            'usuario': self.usuario.to_dict() if hasattr(self.usuario, 'to_dict') and self.usuario else None,
+            'sede': self.sede.to_dict() if self.sede and hasattr(self.sede, 'to_dict') else None
         }
     
     @staticmethod
     def generate_no_recoleccion():
-        """Genera un número de recolección único"""
-        letters = ''.join(random.choices(string.ascii_uppercase, k=3))
-        numbers = ''.join(random.choices(string.digits, k=3))
-        return f"{letters}{numbers}"
+        """Genera un número de recolección único en la base de datos (AAA111)."""
+        from config.connection import db  # aseguramos acceso a la sesión
+        
+        while True:
+            letters = ''.join(random.choices(string.ascii_uppercase, k=3))
+            numbers = ''.join(random.choices(string.digits, k=3))
+            code = f"{letters}{numbers}"
+
+            # Verificar si ya existe en la BD
+            exists = db.session.query(
+                db.session.query(Recoleccion).filter_by(NoRecoleccion=code).exists()
+            ).scalar()
+
+            if not exists:
+                return code
     
     @classmethod
     def create_table_if_not_exists(cls):

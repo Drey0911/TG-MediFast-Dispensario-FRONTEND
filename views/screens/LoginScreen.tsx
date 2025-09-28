@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, StatusBar, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, SafeAreaView, StatusBar, ScrollView, KeyboardAvoidingView, Platform} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { AuthPresenter } from '../../presenters/AuthPresenter';
 import BrandHeader from '../components/BrandHeader';
@@ -55,6 +55,10 @@ const LoginScreen: React.FC = () => {
     navigation.navigate('Register');
   };
 
+  const handleNavigateToPasswordRecovery = () => {
+    navigation.navigate('PasswordRecovery');
+  };
+
   return (
     <LinearGradient
       colors={['#239c64ff', '#2eb374', '#42d68c']}
@@ -89,7 +93,10 @@ const LoginScreen: React.FC = () => {
               onPasswordChange={setPassword}
               onLogin={handleLogin}
               onNavigateToRegister={handleNavigateToRegister}
+              onNavigateToPasswordRecovery={handleNavigateToPasswordRecovery}
             />
+
+            {/* Ya no necesitamos el botón aquí */}
           </ScrollView>
         </KeyboardAvoidingView>
         
@@ -131,7 +138,7 @@ const styles = StyleSheet.create({
   topSection: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: 120, 
+    minHeight: 110, 
   },
   bottomBackground: {
     position: 'absolute',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomInput from './CustomInput';
 import CustomButton from './CustomButton';
@@ -12,6 +12,7 @@ interface LoginFormProps {
   onPasswordChange: (text: string) => void;
   onLogin: () => void;
   onNavigateToRegister: () => void;
+  onNavigateToPasswordRecovery: () => void; // Nueva prop
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -22,6 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onPasswordChange,
   onLogin,
   onNavigateToRegister,
+  onNavigateToPasswordRecovery, // Nueva prop
 }) => {
   return (
     <LinearGradient
@@ -54,7 +56,22 @@ const LoginForm: React.FC<LoginFormProps> = ({
             onChangeText={onPasswordChange}
             placeholder="Ingrese su contraseña..."
             secureTextEntry
+            showTogglePassword 
           />
+
+          {/* Botón de olvidé mi contraseña */}
+          <View style={styles.forgotPasswordContainer}>
+            <TouchableOpacity 
+              style={styles.forgotPasswordButton}
+              onPress={onNavigateToPasswordRecovery}
+              activeOpacity={0.7}
+              disabled={loading}
+            >
+              <Text style={styles.forgotPasswordText}>
+                ¿Olvidaste tu contraseña?
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         
         <View style={styles.buttonsContainer}>
@@ -154,6 +171,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 2,
     width: '100%',
+  },
+  forgotPasswordContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
+  forgotPasswordButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 5,
+  },
+  forgotPasswordText: {
+    color: '#2a9960',
+    fontSize: 14,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });
 
