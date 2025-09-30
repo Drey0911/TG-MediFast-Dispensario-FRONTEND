@@ -28,7 +28,7 @@ class WhatsAppService:
         }
         
         # Crear el mensaje de texto con la información
-        mensaje = f"""🚨 Notificación Medifast 🚨
+        mensaje = f"""🚨 Notificación Medifast 
 
 Hola, se ha realizado un cambio en el stock de un medicamento que tienes en favoritos.:
 
@@ -96,7 +96,7 @@ Por favor verificar el inventario en la APP en el apartado de MEDICAMENTOS."""
             lista_medicamentos = f"   • {medicamentos}"
         
         # Crear el mensaje de recordatorio
-        mensaje = f"""🔔 Recordatorio de Recolección Medifast 🔔
+        mensaje = f"""🔔 Recordatorio de Recolección Medifast
 
 Hola {nombre_paciente},
 
@@ -165,7 +165,7 @@ Te recordamos que tienes una recolección agendada para hoy:
         }
         
         # Crear el mensaje de recuperación de contraseña
-        mensaje = f"""🔐 Recuperación de Contraseña - Medifast 🔐
+        mensaje = f"""🔐 Recuperación de Contraseña - Medifast
 
 Hola {nombre_usuario},
 
