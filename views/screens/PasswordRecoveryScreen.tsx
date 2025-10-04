@@ -37,13 +37,11 @@ const PasswordRecoveryScreen: React.FC = () => {
 
   // Función para manejar el cambio de teléfono
   const handleTelefonoChange = (text: string) => {
-    // Siempre mantener +57 al inicio
     if (text.length < 3) {
       setTelefono('+57');
     } else if (!text.startsWith('+57')) {
       setTelefono('+57' + text.replace('+57', ''));
     } else {
-      // Limitar a +57 + 10 dígitos
       if (text.length <= 13) {
         setTelefono(text);
       }
@@ -70,7 +68,7 @@ const PasswordRecoveryScreen: React.FC = () => {
       return;
     }
 
-    // Validación básica de teléfono - debe tener exactamente +57 + 10 dígitos
+    // Validación básica de teléfono
     if (!/^\+57\d{10}$/.test(telefono)) {
       showAlert('Teléfono inválido', 'El teléfono debe tener 10 dígitos después de +57', 'error');
       return;

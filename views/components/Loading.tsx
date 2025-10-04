@@ -12,7 +12,6 @@ const Loading: React.FC<LoadingProps> = ({ visible = true }) => {
 
   useEffect(() => {
     if (visible) {
-      // Animación de entrada
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -28,7 +27,6 @@ const Loading: React.FC<LoadingProps> = ({ visible = true }) => {
         })
       ]).start();
 
-      // Animación de rotación continua
       Animated.loop(
         Animated.timing(rotateAnim, {
           toValue: 1,

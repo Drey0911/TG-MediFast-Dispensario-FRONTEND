@@ -96,7 +96,6 @@ const LoginScreen: React.FC = () => {
               onNavigateToPasswordRecovery={handleNavigateToPasswordRecovery}
             />
 
-            {/* Ya no necesitamos el botón aquí */}
           </ScrollView>
         </KeyboardAvoidingView>
         

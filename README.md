@@ -1,97 +1,209 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# MediFast
 
-# Getting Started
+![MediFast Logo](./img/logo-green.png)
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Descripción
 
-## Step 1: Start Metro
+MediFast es una aplicación móvil desarrollada en React Native que facilita la gestión de medicamentos y recolecciones en dispensarios médicos. La aplicación permite a los usuarios consultar medicamentos disponibles, solicitar recolecciones, gestionar favoritos y acceder a su historial de solicitudes.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Arquitectura
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+MediFast está desarrollado siguiendo el patrón de arquitectura MVP (Modelo-Vista-Presentador):
 
-```sh
-# Using npm
-npm start
+### Modelo (Models)
+Contiene las clases de datos y la lógica de negocio:
+- `User.ts`: Modelo para la información del usuario
+- `Medicamento.ts`: Modelo para los medicamentos
+- `Recoleccion.ts`: Modelo para las solicitudes de recolección
+- `Favorito.ts`: Modelo para los medicamentos favoritos
 
-# OR using Yarn
-yarn start
-```
+### Vista (Views)
+Contiene las interfaces de usuario divididas en:
 
-## Step 2: Build and run your app
+#### Componentes (Components)
+- `Alert.tsx`: Componente para mostrar alertas
+- `BrandHeader.tsx`: Encabezado con la marca de la aplicación
+- `ButtonModules.tsx`: Botones para los módulos principales
+- `CustomButton.tsx`: Botón personalizado reutilizable
+- `CustomInput.tsx`: Campo de entrada personalizado
+- `Loading.tsx`: Componente de carga
+- `LoginForm.tsx`: Formulario de inicio de sesión
+- `Splash.tsx`: Pantalla de carga inicial
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+#### Pantallas (Screens)
+- `LoginScreen.tsx`: Pantalla de inicio de sesión
+- `RegisterScreen.tsx`: Pantalla de registro
+- `HomeScreen.tsx`: Pantalla principal
+- `MedicamentosScreen.tsx`: Listado de medicamentos
+- `DetailScreen.tsx`: Detalles de un medicamento
+- `RecoleccionesScreen.tsx`: Gestión de recolecciones
+- `FavoritosScreen.tsx`: Medicamentos favoritos
+- `HistorialScreen.tsx`: Historial de solicitudes
+- `UserScreen.tsx`: Perfil de usuario
+- `PackageScreen.tsx`: Información de paquetes
+- `PasswordRecoveryScreen.tsx`: Recuperación de contraseña
 
-### Android
+### Presentador (Presenters)
+Contiene la lógica de presentación que conecta los modelos con las vistas:
+- `AuthPresenter.ts`: Gestión de autenticación
+- `UserPresenter.ts`: Gestión de datos de usuario
+- `MedicamentoPresenter.ts`: Gestión de medicamentos
+- `RecoleccionPresenter.ts`: Gestión de recolecciones
+- `FavoritoPresenter.ts`: Gestión de favoritos
+Como tambien, contienen el consumo de API por medio de la configuracion del servicio con AXIOS usando await api.post
+y los demas metodos HTTP como GET, PUT, DELETE, etc.
 
-```sh
-# Using npm
-npm run android
+## Conexión con la API
 
-# OR using Yarn
-yarn android
-```
+La aplicación se conecta a un backend a través de una API REST utilizando Axios:
 
-### iOS
+- La configuración base de la API se encuentra en `config/apiBase.ts`
+- Los servicios de API están en `services/api.ts`
+- Se utilizan interceptores para manejar la autenticación y los errores
+- La aplicación también implementa WebSockets para comunicación en tiempo real
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Librerías Principales
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+- **React Native**: Framework principal para el desarrollo de la aplicación móvil
+- **React Navigation**: Navegación entre pantallas
+- **Axios**: Cliente HTTP para realizar peticiones a la API
+- **Socket.io-client**: Cliente para comunicación en tiempo real
+- **AsyncStorage**: Almacenamiento local de datos
+- **React Native Vector Icons**: Iconos para la interfaz
+- **React Native Linear Gradient**: Efectos de gradiente
+- **React Native DateTimePicker**: Selector de fecha y hora
+- **JWT Decode**: Decodificación de tokens JWT
 
-```sh
-bundle install
-```
+## Instalación y Configuración
 
-Then, and every time you update your native dependencies, run:
+### Requisitos Previos
 
-```sh
-bundle exec pod install
-```
+- Node.js (versión 18 o superior)
+- npm o yarn
+- React Native CLI
+- Android Studio (para desarrollo en Android)
+- Xcode (para desarrollo en iOS, solo macOS)
+- JDK 11 o superior
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### Pasos de Instalación
 
-```sh
-# Using npm
-npm run ios
+1. Clonar el repositorio:
+   ```
+   git clone <url-del-repositorio>
+   cd MediFast
+   ```
 
-# OR using Yarn
-yarn ios
-```
+2. Instalar dependencias:
+   ```
+   npm install
+   # o
+   yarn install
+   ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+3. Para iOS, instalar pods (solo macOS):
+   ```
+   bundle install
+   bundle exec pod install
+   ```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+4. Configurar la URL de la API:
+   - Editar el archivo `config/apiBase.ts` con la URL correcta del backend
 
-## Step 3: Modify your app
+### Ejecución en Modo Desarrollo
 
-Now that you have successfully run the app, let's make changes!
+1. Iniciar el servidor de Metro:
+   ```
+   npx react-native start
+   ```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+2. En otra terminal, ejecutar la aplicación:
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+   Para Android:
+   ```
+   npx react-native run-android
+   ```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+   Para iOS (solo macOS):
+   ```
+   npx react-native run-ios
+   ```
 
-## Congratulations! :tada:
+## Funcionalidades Principales
 
-You've successfully run and modified your React Native App. :partying_face:
+- **Autenticación**: Registro, inicio de sesión y recuperación de contraseña
+- **Consulta de Medicamentos**: Listado y búsqueda de medicamentos disponibles
+- **Detalles de Medicamentos**: Información detallada de cada medicamento
+- **Favoritos**: Guardar medicamentos como favoritos para acceso rápido
+- **Recolecciones**: Solicitar y gestionar recolecciones de medicamentos
+- **Historial**: Consultar el historial de solicitudes realizadas
+- **Perfil de Usuario**: Gestión de información personal
 
-### Now what?
+## Estructura de Navegación
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+La aplicación utiliza React Navigation Stack Navigator para la navegación entre pantallas:
 
-# Troubleshooting
+- Splash (pantalla inicial)
+- Login (inicio de sesión)
+- Register (registro)
+- PasswordRecovery (recuperación de contraseña)
+- Home (pantalla principal)
+- Medicamentos (listado de medicamentos)
+- Detail (detalles de medicamento)
+- Recolecciones (gestión de recolecciones)
+- Favoritos (medicamentos favoritos)
+- Historial (historial de solicitudes)
+- User (perfil de usuario)
+- Package (información de paquetes)
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## Generación de APK para Android
 
-# Learn More
+Para construir el archivo APK de producción de MediFast, sigue estos pasos:
 
-To learn more about React Native, take a look at the following resources:
+### Preparación de la versión
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1. **Actualiza la versión en `android/app/build.gradle`:**
+   ```
+   android {
+       defaultConfig {
+           versionCode 1  // Incrementa este número en cada release
+           versionName "1.0"  // Cambia el número de versión
+       }
+   }
+   ```
+
+2. **Genera el bundle de la aplicación:**
+   ```
+   cd android
+   ./gradlew bundleRelease
+   ```
+
+3. **Genera el APK de release:**
+   ```
+   ./gradlew assembleRelease
+   ```
+
+4. **El APK generado se encuentra en:**
+   ```
+   android/app/build/outputs/apk/release/app-release.apk
+   ```
+
+### Requisitos previos para generar APK
+
+- Tener configurado correctamente el `keystore` para firmar la aplicación
+- Configurar las variables de entorno en `~/.gradle/gradle.properties`:
+  ```
+  MYAPP_UPLOAD_STORE_FILE=my-upload-key.keystore
+  MYAPP_UPLOAD_KEY_ALIAS=my-key-alias
+  MYAPP_UPLOAD_STORE_PASSWORD=*****
+  MYAPP_UPLOAD_KEY_PASSWORD=*****
+  ```
+
+### Instalación del APK
+
+Una vez generado el APK, puedes instalarlo directamente en un dispositivo Android
+
+## Licencia
+
+Todos los derechos reservados. © 2025 Andrey Stteven Mantilla Leon y Daniel Esteban Pinzon Cardenas.
+
+Este software es propiedad de sus creadores y no puede ser reproducido, distribuido o utilizado sin autorización expresa.

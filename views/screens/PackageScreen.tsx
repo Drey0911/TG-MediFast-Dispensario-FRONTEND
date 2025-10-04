@@ -49,6 +49,8 @@ const PackageScreen: React.FC = () => {
     loadCarrito();
   }, []);
 
+
+  // Limpiado por si el carrito presenta alguna corrupcion por las entradas del async storage
   const loadCarrito = async () => {
     try {
       const carritoStr = await AsyncStorage.getItem('carrito');
@@ -57,7 +59,7 @@ const PackageScreen: React.FC = () => {
         setCarrito(carritoData);
       }
     } catch (error) {
-      console.log('⚠️ Carrito corrupto, limpiando...');
+      console.log('Limpieza del asyncStorage');
       await AsyncStorage.removeItem('carrito');
       setCarrito([]);
     }

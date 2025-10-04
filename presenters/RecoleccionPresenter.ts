@@ -11,7 +11,7 @@ export class RecoleccionPresenter {
     }
   }
 
-  // Método para crear recolecciones en batch
+  // Método para crear recolecciones en batch (varias a la vez)
   static async createRecoleccionBatch(data: RecoleccionCreate[]): Promise<Recoleccion[]> {
     try {
       const response = await api.post('/recolecciones/batch', data);

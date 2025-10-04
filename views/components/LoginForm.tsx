@@ -12,7 +12,7 @@ interface LoginFormProps {
   onPasswordChange: (text: string) => void;
   onLogin: () => void;
   onNavigateToRegister: () => void;
-  onNavigateToPasswordRecovery: () => void; // Nueva prop
+  onNavigateToPasswordRecovery: () => void; 
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onPasswordChange,
   onLogin,
   onNavigateToRegister,
-  onNavigateToPasswordRecovery, // Nueva prop
+  onNavigateToPasswordRecovery, 
 }) => {
   return (
     <LinearGradient
@@ -39,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           resizeMode="contain"
         />
         
-        {/* Separación añadida aquí */}
+        {/* Separación */}
         <View style={styles.inputsContainer}>
           <CustomInput
             label="DNI"

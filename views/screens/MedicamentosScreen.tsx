@@ -602,22 +602,22 @@ detailButton: {
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center',
-    paddingHorizontal: width * 0.1,  // 10% del ancho de pantalla
-    paddingVertical: height * 0.01,  // 2% de alto
+    paddingHorizontal: width * 0.1, 
+    paddingVertical: height * 0.01,  
     backgroundColor: '#FAFAFA',
     borderTopWidth: 1, 
     borderTopColor: 'rgba(66, 214, 140, 0.1)',
     marginBottom: height * 0.05
   },
  logo: { 
-    width: width * 0.45,   // 45% del ancho total
-    height: height * 0.1,  // 10% de la altura total
+    width: width * 0.45, 
+    height: height * 0.1, 
     resizeMode: 'contain',
   },
   boxButton: {
     backgroundColor: '#42d68c',
-    width: width * 0.12,   // 12% del ancho
-    height: width * 0.12,  // Mantener cuadrado
+    width: width * 0.12, 
+    height: width * 0.12,
     borderRadius: (width * 0.12) / 2,
     justifyContent: 'center',
     alignItems: 'center',

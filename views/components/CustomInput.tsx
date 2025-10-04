@@ -8,7 +8,7 @@ interface CustomInputProps extends TextInputProps {
   onChangeText: (text: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
-  showTogglePassword?: boolean; // 👈 Nuevo
+  showTogglePassword?: boolean; 
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({

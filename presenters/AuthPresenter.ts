@@ -36,7 +36,6 @@ export class AuthPresenter {
   static async recoverPassword(dni: string, telefono: string): Promise<void> {
     try {
       await api.post('/recover-password', { dni, telefono });
-      // La respuesta exitosa no necesita retornar datos específicos
       return;
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Error en la recuperación de contraseña, Revisa tu conexión a internet');

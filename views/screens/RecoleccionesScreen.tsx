@@ -269,8 +269,8 @@ const RecoleccionesScreen: React.FC = () => {
 
   const getEstadoColor = (estado: number) => {
     switch (estado) {
-      case 0: return '#42d68c'; // Programada - verde
-      default: return '#6c757d'; // Desconocido - gris
+      case 0: return '#42d68c'; 
+      default: return '#6c757d'; 
     }
   };
 
@@ -832,7 +832,6 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontWeight: 'bold',
   },
-  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

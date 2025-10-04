@@ -16,7 +16,7 @@ interface ButtonModuleProps {
 }
 
 const { width } = Dimensions.get('window');
-const BUTTON_SIZE = (width - 70) / 2; // 2 columnas con márgenes
+const BUTTON_SIZE = (width - 70) / 2; 
 
 const ButtonModule: React.FC<ButtonModuleProps> = ({
   iconName,

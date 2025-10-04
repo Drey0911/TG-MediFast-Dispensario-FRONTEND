@@ -194,10 +194,10 @@ const HistorialScreen: React.FC = () => {
 
   const getEstadoColor = (estado: number) => {
     switch (estado) {
-      case 1: return '#42d68c'; // Completada - verde
-      case 3: return '#ff6b6b'; // Vencida - rojo
-      case 4: return '#6c757d'; // Cancelada - gris
-      default: return '#6c757d'; // Desconocido - gris
+      case 1: return '#42d68c'; 
+      case 3: return '#ff6b6b'; 
+      case 4: return '#6c757d'; 
+      default: return '#6c757d'; 
     }
   };
 
@@ -690,7 +690,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 8,
   },
-  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

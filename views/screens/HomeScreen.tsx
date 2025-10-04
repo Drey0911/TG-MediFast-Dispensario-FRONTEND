@@ -259,7 +259,7 @@ const HomeScreen: React.FC = () => {
         </View>
       </ScrollView>
       
-      {/* Footer con logo mejorado */}
+      {/* Footer */}
       <View style={styles.footer}>
         <Image 
           source={require('../../img/logo-green.png')} 
@@ -283,7 +283,6 @@ const HomeScreen: React.FC = () => {
   );
 };
 
-// Estilos actualizados
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
