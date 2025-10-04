@@ -1,6 +1,8 @@
 # MediFast
 
-![MediFast Logo](./img/logo-green.png)
+<p align="center">
+<img src="./static/img/logo-green.png" alt="MediFast Logo" width="300">
+</p>
 
 ## Descripción
 
