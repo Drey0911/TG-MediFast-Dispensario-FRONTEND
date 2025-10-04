@@ -1,7 +1,7 @@
 # MediFast
 
 <p align="center">
-<img src="./static/img/logo-green.png" alt="MediFast Logo" width="300">
+  <img src="./static/img/logo-green.png" alt="MediFast Logo" width="300">
 </p>
 
 ## Descripción
