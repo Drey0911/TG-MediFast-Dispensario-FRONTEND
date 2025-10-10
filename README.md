@@ -102,13 +102,7 @@ La aplicación se conecta a un backend a través de una API REST utilizando Axio
    yarn install
    ```
 
-3. Para iOS, instalar pods (solo macOS):
-   ```
-   bundle install
-   bundle exec pod install
-   ```
-
-4. Configurar la URL de la API:
+3. Configurar la URL de la API:
    - Editar el archivo `config/apiBase.ts` con la URL correcta del backend
 
 ### Ejecución en Modo Desarrollo
@@ -123,11 +117,6 @@ La aplicación se conecta a un backend a través de una API REST utilizando Axio
    Para Android:
    ```
    npx react-native run-android
-   ```
-
-   Para iOS (solo macOS):
-   ```
-   npx react-native run-ios
    ```
 
 ## Funcionalidades Principales
@@ -174,14 +163,35 @@ Para construir el archivo APK de producción de MediFast, sigue estos pasos:
    ```
 
 2. **Genera el bundle de la aplicación:**
+
+En linux 
+
    ```
    cd android
    ./gradlew bundleRelease
    ```
 
-3. **Genera el APK de release:**
+En Windows
+
    ```
-   ./gradlew assembleRelease
+   cd android
+   gradlew bundleRelease
+   ```
+
+3. **Genera el APK de release:**
+
+En linux
+
+   ```
+   cd android
+   ./gradlew assembleRelease 
+   ```
+
+En Windows 
+
+   ```
+   cd android
+   gradlew assembleRelease 
    ```
 
 4. **El APK generado se encuentra en:**
