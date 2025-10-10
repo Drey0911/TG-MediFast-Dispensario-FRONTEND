@@ -112,9 +112,7 @@ La aplicación se conecta a un backend a través de una API REST utilizando Axio
    npx react-native start
    ```
 
-2. En otra terminal, ejecutar la aplicación:
-
-   Para Android:
+2. En otra terminal, ejecutar la aplicación en android (USB con modo depuracion activado):
    ```
    npx react-native run-android
    ```
