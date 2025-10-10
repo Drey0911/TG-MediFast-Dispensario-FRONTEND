@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { AuthPresenter } from '../../presenters/AuthPresenter';
-import BrandHeader from '../components/BrandHeader';
+import BrandHeaderSize from '../components/BrandHeaderSize';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import Alert, { AlertType } from '../components/Alert';
@@ -138,7 +138,7 @@ const RegisterScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             bounces={false}>
             <View style={styles.topSection}>
-              <BrandHeader />
+              <BrandHeaderSize />
             </View>
 
             <View style={styles.formContainer}>

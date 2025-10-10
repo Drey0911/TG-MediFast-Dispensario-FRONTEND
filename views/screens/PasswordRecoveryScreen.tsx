@@ -10,17 +10,20 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity,
-  ActivityIndicator 
+  ActivityIndicator,
+  Dimensions 
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { AuthPresenter } from '../../presenters/AuthPresenter';
-import BrandHeader from '../components/BrandHeader';
+import BrandHeaderSize from '../components/BrandHeaderSize';
 import Alert, { AlertType } from '../components/Alert'; 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 
 type PasswordRecoveryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PasswordRecovery'>;
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const PasswordRecoveryScreen: React.FC = () => {
   const navigation = useNavigation<PasswordRecoveryScreenNavigationProp>();
@@ -119,7 +122,7 @@ const PasswordRecoveryScreen: React.FC = () => {
             bounces={false}
           >
             <View style={styles.topSection}>
-              <BrandHeader />
+              <BrandHeaderSize/>
             </View>
             
             <View style={styles.formContainer}>
@@ -215,34 +218,36 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    minHeight: '100%',
+    minHeight: SCREEN_HEIGHT,
   },
   topSection: {
     flex: 1,
     justifyContent: 'center',
-    marginBottom: 2,
-    marginTop: 70,
-    minHeight: 120, 
+    marginBottom: SCREEN_HEIGHT * 0.01,
+    marginTop: SCREEN_HEIGHT * 0.080,
+    minHeight: SCREEN_HEIGHT * 0.05,
   },
   bottomBackground: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 100, 
+    height: SCREEN_HEIGHT * 0.12,
     backgroundColor: '#FAFAFA',
     zIndex: -1,
   },
   formContainer: {
     flex: 2,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+    marginBottom: SCREEN_HEIGHT * 0.075,
+    marginTop: SCREEN_HEIGHT * 0.01,
+    paddingHorizontal: SCREEN_WIDTH * 0.05,
+    paddingBottom: SCREEN_HEIGHT * 0.05,
   },
   formCard: {
     backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
+    borderRadius: SCREEN_WIDTH * 0.05,
+    padding: SCREEN_WIDTH * 0.06,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -251,48 +256,48 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 8,
-    marginBottom: 20,
+    marginBottom: SCREEN_HEIGHT * 0.02,
   },
   title: {
-    fontSize: 24,
+    fontSize: SCREEN_WIDTH * 0.06,
     fontWeight: 'bold',
     color: '#2a9960',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: SCREEN_HEIGHT * 0.01,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: SCREEN_WIDTH * 0.035,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 25,
-    lineHeight: 20,
+    marginBottom: SCREEN_HEIGHT * 0.03,
+    lineHeight: SCREEN_HEIGHT * 0.025,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: SCREEN_HEIGHT * 0.025,
   },
   inputLabel: {
-    fontSize: 16,
+    fontSize: SCREEN_WIDTH * 0.04,
     fontWeight: '600',
     color: '#2a9960',
-    marginBottom: 8,
+    marginBottom: SCREEN_HEIGHT * 0.01,
   },
   input: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    fontSize: 16,
+    borderRadius: SCREEN_WIDTH * 0.03,
+    paddingHorizontal: SCREEN_WIDTH * 0.04,
+    paddingVertical: SCREEN_HEIGHT * 0.015,
+    fontSize: SCREEN_WIDTH * 0.04,
     color: '#333',
     backgroundColor: '#FAFAFA',
   },
   button: {
     backgroundColor: '#2a9960',
-    borderRadius: 12,
-    paddingVertical: 15,
+    borderRadius: SCREEN_WIDTH * 0.03,
+    paddingVertical: SCREEN_HEIGHT * 0.018,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: SCREEN_HEIGHT * 0.01,
     shadowColor: '#2a9960',
     shadowOffset: {
       width: 0,
@@ -309,17 +314,17 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: SCREEN_WIDTH * 0.04,
     fontWeight: '600',
   },
   backButton: {
-    marginTop: 15,
-    paddingVertical: 10,
+    marginTop: SCREEN_HEIGHT * 0.02,
+    paddingVertical: SCREEN_HEIGHT * 0.012,
     alignItems: 'center',
   },
   backButtonText: {
     color: '#2a9960',
-    fontSize: 16,
+    fontSize: SCREEN_WIDTH * 0.04,
     fontWeight: '500',
     textDecorationLine: 'underline',
   },

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, SafeAreaView, StatusBar, ScrollView, KeyboardAvoidingView, Platform} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { AuthPresenter } from '../../presenters/AuthPresenter';
-import BrandHeader from '../components/BrandHeader';
+import BrandHeaderSize from '../components/BrandHeaderSize';
 import LoginForm from '../components/LoginForm';
 import Alert, { AlertType } from '../components/Alert'; 
 import { useNavigation } from '@react-navigation/native';
@@ -82,7 +82,7 @@ const LoginScreen: React.FC = () => {
             bounces={false}
           >
             <View style={styles.topSection}>
-              <BrandHeader />
+              <BrandHeaderSize />
             </View>
             
             <LoginForm
