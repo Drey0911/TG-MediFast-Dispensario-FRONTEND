@@ -140,19 +140,16 @@ const HistorialScreen: React.FC = () => {
 
     // Filtrar por rango de fechas
     if (startDate) {
+      const startDateStr = startDate.toISOString().split('T')[0]; // YYYY-MM-DD
       filtered = filtered.filter(item => {
-        const itemDate = new Date(item.fechaRecoleccion);
-        return itemDate >= startDate;
+        return item.fechaRecoleccion >= startDateStr;
       });
     }
 
     if (endDate) {
+      const endDateStr = endDate.toISOString().split('T')[0]; // YYYY-MM-DD
       filtered = filtered.filter(item => {
-        const itemDate = new Date(item.fechaRecoleccion);
-        // Añadir un día para incluir la fecha final
-        const endDatePlusOne = new Date(endDate);
-        endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
-        return itemDate < endDatePlusOne;
+        return item.fechaRecoleccion <= endDateStr;
       });
     }
 
@@ -168,14 +165,11 @@ const HistorialScreen: React.FC = () => {
     loadRecolecciones();
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
+const formatDate = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 
   const formatTime = (timeString: string) => {
     const time = timeString.split(':');
@@ -409,42 +403,42 @@ const HistorialScreen: React.FC = () => {
                 ))}
               </View>
 
-              {/* Filtro por Fecha */}
-              <Text style={styles.filterLabel}>Rango de Fechas</Text>
-              
-              <Text style={styles.dateLabel}>Desde:</Text>
-              <TouchableOpacity 
-                style={styles.dateInput}
-                onPress={() => setShowStartDatePicker(true)}
-              >
-                <Icon name="calendar" size={16} color="#666" />
-                <Text style={styles.dateText}>
-                  {startDate ? formatDate(startDate.toISOString()) : 'Seleccionar fecha'}
-                </Text>
-              </TouchableOpacity>
+                  {/* Filtro por Fecha */}
+                  <Text style={styles.filterLabel}>Rango de Fechas</Text>
+                  
+                  <Text style={styles.dateLabel}>Desde:</Text>
+                  <TouchableOpacity 
+                    style={styles.dateInput}
+                    onPress={() => setShowStartDatePicker(true)}
+                  >
+                    <Icon name="calendar" size={16} color="#666" />
+                    <Text style={styles.dateText}>
+                      {startDate ? formatDate(startDate.toISOString().split('T')[0]) : 'Seleccionar fecha'}
+                    </Text>
+                  </TouchableOpacity>
 
-              <Text style={styles.dateLabel}>Hasta:</Text>
-              <TouchableOpacity 
-                style={styles.dateInput}
-                onPress={() => setShowEndDatePicker(true)}
-              >
-                <Icon name="calendar" size={16} color="#666" />
-                <Text style={styles.dateText}>
-                  {endDate ? formatDate(endDate.toISOString()) : 'Seleccionar fecha'}
-                </Text>
-              </TouchableOpacity>
+                  <Text style={styles.dateLabel}>Hasta:</Text>
+                  <TouchableOpacity 
+                    style={styles.dateInput}
+                    onPress={() => setShowEndDatePicker(true)}
+                  >
+                    <Icon name="calendar" size={16} color="#666" />
+                    <Text style={styles.dateText}>
+                      {endDate ? formatDate(endDate.toISOString().split('T')[0]) : 'Seleccionar fecha'}
+                    </Text>
+                  </TouchableOpacity>
 
-              {(startDate || endDate) && (
-                <TouchableOpacity 
-                  style={styles.clearDateButton}
-                  onPress={() => {
-                    setStartDate(null);
-                    setEndDate(null);
-                  }}
-                >
-                  <Text style={styles.clearDateText}>Limpiar fechas</Text>
-                </TouchableOpacity>
-              )}
+                  {(startDate || endDate) && (
+                    <TouchableOpacity 
+                      style={styles.clearDateButton}
+                      onPress={() => {
+                        setStartDate(null);
+                        setEndDate(null);
+                      }}
+                    >
+                      <Text style={styles.clearDateText}>Limpiar fechas</Text>
+                    </TouchableOpacity>
+                  )}
             </ScrollView>
 
             <View style={styles.modalFooter}>
