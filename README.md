@@ -45,6 +45,11 @@ Contiene las interfaces de usuario divididas en:
 - `PackageScreen.tsx`: Información de paquetes
 - `PasswordRecoveryScreen.tsx`: Recuperación de contraseña
 
+#### Prototipo de CHATBOT
+
+- `HomeScreenChatBot.tsx`: Para usar el prototipo del chatbot en estado BETA se pueden intercambiar los nombres
+de las screen, para que quede solo HomeScreen (pantalla de aterrizaje)
+
 ### Presentador (Presenters)
 Contiene la lógica de presentación que conecta los modelos con las vistas:
 - `AuthPresenter.ts`: Gestión de autenticación

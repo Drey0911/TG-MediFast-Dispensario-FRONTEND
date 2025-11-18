@@ -4,7 +4,7 @@ export interface AppConfig {
 }
 
 const config: AppConfig = {
-  API_BASE_URL: 'https://medifast.up.railway.app' //API Medifast para el consumo en front
+  API_BASE_URL: 'https://homoeomorphic-sottedly-jane.ngrok-free.dev/' //API Medifast para el consumo en front
 };
 
 export const getConfig = (): AppConfig => {
