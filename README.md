@@ -4,6 +4,19 @@
   <img src="img/logo-green.png" alt="MediFast Logo" width="300">
 </p>
 
+## Tecnologías
+
+<p align="center">
+   <a href="https://reactnative.dev/"><img src="https://img.shields.io/badge/React%20Native-0.73%2B-61DAFB?logo=react&logoColor=white" alt="React Native"></a>
+   <a href="https://reactnavigation.org/"><img src="https://img.shields.io/badge/React%20Navigation-6.0%2B-3C3C3D?logo=react&logoColor=white" alt="React Navigation"></a>
+   <a href="https://axios-http.com/"><img src="https://img.shields.io/badge/Axios-HTTP%20Client-671DDF?logo=axios&logoColor=white" alt="Axios"></a>
+   <a href="https://socket.io/"><img src="https://img.shields.io/badge/Socket.IO-Realtime-2E7D32?logo=socketdotio&logoColor=white" alt="Socket.IO"></a>
+   <a href="https://react-native-async-storage.github.io/async-storage/"><img src="https://img.shields.io/badge/AsyncStorage-LocalDB-FF6B6B?logo=react&logoColor=white" alt="AsyncStorage"></a>
+   <a href="https://oblador.github.io/react-native-vector-icons/"><img src="https://img.shields.io/badge/Vector%20Icons-UI-8B5CF6?logo=react&logoColor=white" alt="Vector Icons"></a>
+   <a href="https://jwt.io/"><img src="https://img.shields.io/badge/JWT-Auth-FFA500?logo=jwt&logoColor=white" alt="JWT"></a>
+   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-Language-3178C6?logo=typescript&logoColor=white" alt="TypeScript"></a>
+</p>
+
 ## Descripción
 
 MediFast es una aplicación móvil desarrollada en React Native que facilita la gestión de medicamentos y recolecciones en dispensarios médicos. La aplicación permite a los usuarios consultar medicamentos disponibles, solicitar recolecciones, gestionar favoritos y acceder a su historial de solicitudes.
