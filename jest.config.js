@@ -7,9 +7,5 @@ module.exports = {
   
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   
-  moduleNameMapper: {
-    'react-native-linear-gradient': 'react-native-linear-gradient/jest/react-native-linear-gradient.js'
-  },
-  
   testEnvironment: 'node',
 };
