@@ -47,6 +47,9 @@ jobs:
             ],
             moduleNameMapper: {
               '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js',
+              '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/async-storage.js',
+              '^@react-navigation/native$': '<rootDir>/__mocks__/@react-navigation-native.js',
+              '^@react-navigation/stack$': '<rootDir>/__mocks__/@react-navigation-stack.js',
               '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
             },
             testEnvironment: 'node',
@@ -62,10 +65,65 @@ jobs:
       - name: Create mock files
         run: |
           mkdir -p __mocks__
+          
+          # Mock para AsyncStorage
+          cat > __mocks__/async-storage.js << 'ASYNCSTORAGE'
+          module.exports = {
+            getItem: jest.fn(() => Promise.resolve(null)),
+            setItem: jest.fn(() => Promise.resolve()),
+            removeItem: jest.fn(() => Promise.resolve()),
+            clear: jest.fn(() => Promise.resolve()),
+            getAllKeys: jest.fn(() => Promise.resolve([])),
+            mergeItem: jest.fn(() => Promise.resolve()),
+            multiGet: jest.fn(() => Promise.resolve([])),
+            multiSet: jest.fn(() => Promise.resolve()),
+            multiRemove: jest.fn(() => Promise.resolve()),
+            multiMerge: jest.fn(() => Promise.resolve()),
+          };
+          ASYNCSTORAGE
+          
+          # Mock para react-native-linear-gradient
+          cat > __mocks__/react-native-linear-gradient.js << 'LINEARGRADIENT'
+          module.exports = { 
+            default: jest.fn(({ children, ...props }) => children || null) 
+          };
+          LINEARGRADIENT
+          
+          # Mock para React Navigation Native
+          cat > __mocks__/@react-navigation-native.js << 'NAVIGATIONNATIVE'
+          module.exports = {
+            NavigationContainer: jest.fn(({ children, ...props }) => children || null),
+            useNavigation: () => ({ 
+              navigate: jest.fn(),
+              goBack: jest.fn(),
+              reset: jest.fn(),
+              dispatch: jest.fn(),
+              setOptions: jest.fn(),
+              isFocused: jest.fn(() => true),
+              addListener: jest.fn(),
+              removeListener: jest.fn()
+            }),
+            useRoute: () => ({ 
+              params: {},
+              name: 'MockScreen'
+            }),
+            useFocusEffect: jest.fn(),
+            useIsFocused: () => true
+          };
+          NAVIGATIONNATIVE
+          
+          # Mock para React Navigation Stack
+          cat > __mocks__/@react-navigation-stack.js << 'NAVIGATIONSTACK'
+          module.exports = {
+            createStackNavigator: jest.fn(() => ({
+              Navigator: jest.fn(({ children, ...props }) => children || null),
+              Screen: jest.fn(() => null)
+            }))
+          };
+          NAVIGATIONSTACK
+          
+          # Mock para archivos estáticos
           echo 'module.exports = "test-file-stub";' > __mocks__/fileMock.js
-          echo 'module.exports = { default: "LinearGradient" };' > __mocks__/react-native-linear-gradient.js
-          echo 'module.exports = { NavigationContainer: "NavigationContainer" };' > __mocks__/@react-navigation-native.js
-          echo 'module.exports = { createStackNavigator: () => ({ Navigator: "Navigator", Screen: "Screen" }) };' > __mocks__/@react-navigation-stack.js
 
       - name: Run tests
         run: npx jest --ci --coverage --config=jest.ci.config.js --verbose
@@ -77,7 +135,7 @@ jobs:
         run: npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output artifacts/index.ios.bundle --assets-dest artifacts
 
       - name: Upload bundle artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4
         with:
           name: js-bundles
           path: artifacts
