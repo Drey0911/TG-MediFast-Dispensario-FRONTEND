@@ -15,17 +15,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies with babel-jest
-        run: |
-          npm ci
-          # Instala babel-jest explícitamente si no está en package.json
-          npm install --save-dev babel-jest @babel/core @babel/preset-env || true
+      - name: Install dependencies
+        run: npm ci
 
       - name: Typecheck (TypeScript)
         run: npx tsc --noEmit
@@ -33,24 +30,28 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      - name: Create Jest config with proper transformation
+      - name: Create Jest config with module mapping
         run: |
           cat > jest.ci.config.js << 'EOF'
           module.exports = {
             preset: 'react-native',
             moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-            transform: {
-              '^.+\\.[jt]sx?$': 'babel-jest',
-            },
             transformIgnorePatterns: [
-              'node_modules/(?!(react-native|@react-native|@react-navigation)/)'
+              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-reanimated)/)'
             ],
+            setupFiles: [
+              './node_modules/react-native-gesture-handler/jestSetup.js'
+            ],
+            moduleNameMapper: {
+              '^react-native$': '<rootDir>/node_modules/react-native',
+              '^@react-navigation/(.*)$': '<rootDir>/node_modules/@react-navigation/$1'
+            },
             testEnvironment: 'node'
           };
           EOF
 
-      - name: Run tests
-        run: npx jest --ci --coverage --config=jest.ci.config.js
+      - name: Run tests with verbose output
+        run: npx jest --ci --coverage --config=jest.ci.config.js --verbose
 
       - name: Bundle JS (Android)
         run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output artifacts/index.android.bundle --assets-dest artifacts
