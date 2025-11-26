@@ -1,0 +1,56 @@
+name: MediFast CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Lint, Typecheck, Test, Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+
+      - name: Run tests (Jest)
+        run: npm test -- --ci --coverage
+
+      - name: Bundle JS (Android)
+        run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output artifacts/index.android.bundle --assets-dest artifacts
+
+      - name: Bundle JS (iOS)
+        run: npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output artifacts/index.ios.bundle --assets-dest artifacts
+
+      - name: Upload bundle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-bundles
+          path: artifacts
+
+  docker-build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t medifast:ci .
