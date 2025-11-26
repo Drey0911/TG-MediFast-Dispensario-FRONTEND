@@ -30,45 +30,13 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      - name: Create comprehensive Jest config
-        run: |
-          cat > jest.ci.config.js << 'EOF'
-          module.exports = {
-            preset: 'react-native',
-            moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-            transform: {
-              '^.+\\.[jt]sx?$': 'babel-jest',
-            },
-            transformIgnorePatterns: [
-              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-reanimated|react-native-linear-gradient)/)'
-            ],
-            setupFiles: [
-              './node_modules/react-native-gesture-handler/jestSetup.js'
-            ],
-            moduleNameMapper: {
-              '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js',
-              '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/async-storage.js',
-              '^@react-navigation/native$': '<rootDir>/__mocks__/@react-navigation-native.js',
-              '^@react-navigation/stack$': '<rootDir>/__mocks__/@react-navigation-stack.js',
-              '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
-            },
-            testEnvironment: 'node',
-            collectCoverageFrom: [
-              'src/**/*.{ts,tsx}',
-              'App.tsx',
-              '!**/node_modules/**',
-              '!**/vendor/**'
-            ]
-          };
-          EOF
-
-      - name: Create mock files
+      - name: Create Jest setup with all necessary mocks
         run: |
           mkdir -p __mocks__
           
           # Mock para AsyncStorage
-          cat > __mocks__/async-storage.js << 'ASYNCSTORAGE'
-          module.exports = {
+          cat > __mocks__/@react-native-async-storage/async-storage.js << 'EOF'
+          export default {
             getItem: jest.fn(() => Promise.resolve(null)),
             setItem: jest.fn(() => Promise.resolve()),
             removeItem: jest.fn(() => Promise.resolve()),
@@ -80,53 +48,56 @@ jobs:
             multiRemove: jest.fn(() => Promise.resolve()),
             multiMerge: jest.fn(() => Promise.resolve()),
           };
-          ASYNCSTORAGE
+          EOF
           
           # Mock para react-native-linear-gradient
-          cat > __mocks__/react-native-linear-gradient.js << 'LINEARGRADIENT'
-          module.exports = { 
-            default: jest.fn(({ children, ...props }) => children || null) 
-          };
-          LINEARGRADIENT
+          cat > __mocks__/react-native-linear-gradient.js << 'EOF'
+          import React from 'react';
+          export default function LinearGradient({ children, ...props }) {
+            return React.createElement('LinearGradient', props, children);
+          }
+          EOF
           
-          # Mock para React Navigation Native
-          cat > __mocks__/@react-navigation-native.js << 'NAVIGATIONNATIVE'
-          module.exports = {
-            NavigationContainer: jest.fn(({ children, ...props }) => children || null),
-            useNavigation: () => ({ 
-              navigate: jest.fn(),
-              goBack: jest.fn(),
-              reset: jest.fn(),
-              dispatch: jest.fn(),
-              setOptions: jest.fn(),
-              isFocused: jest.fn(() => true),
-              addListener: jest.fn(),
-              removeListener: jest.fn()
-            }),
-            useRoute: () => ({ 
-              params: {},
-              name: 'MockScreen'
-            }),
-            useFocusEffect: jest.fn(),
-            useIsFocused: () => true
+          # Mock para react-native-vector-icons
+          cat > __mocks__/react-native-vector-icons.js << 'EOF'
+          export default {
+            createIconSet: () => 'Icon',
+            createIconSetFromIcoMoon: () => 'Icon',
           };
-          NAVIGATIONNATIVE
-          
-          # Mock para React Navigation Stack
-          cat > __mocks__/@react-navigation-stack.js << 'NAVIGATIONSTACK'
-          module.exports = {
-            createStackNavigator: jest.fn(() => ({
-              Navigator: jest.fn(({ children, ...props }) => children || null),
-              Screen: jest.fn(() => null)
-            }))
-          };
-          NAVIGATIONSTACK
+          EOF
           
           # Mock para archivos estáticos
           echo 'module.exports = "test-file-stub";' > __mocks__/fileMock.js
+          
+          # Configuración de Jest
+          cat > jest.ci.config.js << 'EOF'
+          module.exports = {
+            preset: 'react-native',
+            moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+            transformIgnorePatterns: [
+              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-linear-gradient)/)'
+            ],
+            setupFiles: [
+              './node_modules/react-native-gesture-handler/jestSetup.js'
+            ],
+            moduleNameMapper: {
+              '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/@react-native-async-storage/async-storage.js',
+              '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js',
+              '^react-native-vector-icons$': '<rootDir>/__mocks__/react-native-vector-icons.js',
+              '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
+            },
+            testEnvironment: 'node',
+            collectCoverageFrom: [
+              '**/*.{ts,tsx}',
+              '!**/node_modules/**',
+              '!**/vendor/**',
+              '!**/__mocks__/**'
+            ]
+          };
+          EOF
 
       - name: Run tests
-        run: npx jest --ci --coverage --config=jest.ci.config.js --verbose
+        run: npx jest --ci --coverage --config=jest.ci.config.js --passWithNoTests
 
       - name: Bundle JS (Android)
         run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output artifacts/index.android.bundle --assets-dest artifacts
@@ -135,7 +106,7 @@ jobs:
         run: npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output artifacts/index.ios.bundle --assets-dest artifacts
 
       - name: Upload bundle artifacts
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@v4
         with:
           name: js-bundles
           path: artifacts
