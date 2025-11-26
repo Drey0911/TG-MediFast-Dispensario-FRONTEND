@@ -30,27 +30,44 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
-      - name: Create Jest config with module mapping
+      - name: Create comprehensive Jest config
         run: |
           cat > jest.ci.config.js << 'EOF'
           module.exports = {
             preset: 'react-native',
             moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+            transform: {
+              '^.+\\.[jt]sx?$': 'babel-jest',
+            },
             transformIgnorePatterns: [
-              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-reanimated)/)'
+              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-reanimated|react-native-linear-gradient)/)'
             ],
             setupFiles: [
               './node_modules/react-native-gesture-handler/jestSetup.js'
             ],
             moduleNameMapper: {
-              '^react-native$': '<rootDir>/node_modules/react-native',
-              '^@react-navigation/(.*)$': '<rootDir>/node_modules/@react-navigation/$1'
+              '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js',
+              '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
             },
-            testEnvironment: 'node'
+            testEnvironment: 'node',
+            collectCoverageFrom: [
+              'src/**/*.{ts,tsx}',
+              'App.tsx',
+              '!**/node_modules/**',
+              '!**/vendor/**'
+            ]
           };
           EOF
 
-      - name: Run tests with verbose output
+      - name: Create mock files
+        run: |
+          mkdir -p __mocks__
+          echo 'module.exports = "test-file-stub";' > __mocks__/fileMock.js
+          echo 'module.exports = { default: "LinearGradient" };' > __mocks__/react-native-linear-gradient.js
+          echo 'module.exports = { NavigationContainer: "NavigationContainer" };' > __mocks__/@react-navigation-native.js
+          echo 'module.exports = { createStackNavigator: () => ({ Navigator: "Navigator", Screen: "Screen" }) };' > __mocks__/@react-navigation-stack.js
+
+      - name: Run tests
         run: npx jest --ci --coverage --config=jest.ci.config.js --verbose
 
       - name: Bundle JS (Android)
