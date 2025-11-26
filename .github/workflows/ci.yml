@@ -17,6 +17,7 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run lint
+      - run: npm test -- --clearCache
       - run: npm test -- --ci
       - run: npx tsc -p tsconfig.json --noEmit
 
