@@ -5,8 +5,10 @@ module.exports = {
   ],
   setupFiles: ['react-native-gesture-handler/jestSetup'],
   
-  'moduleNameMapper': {
-    '^@react-navigation/native$': '<rootDir>/node_modules/@react-navigation/native/lib/commonjs/index.js',
+  moduleNameMapper: {
+    '^@react-navigation/native$': '@react-navigation/native/lib/commonjs/index.js',
+    '^@react-navigation/stack$': '@react-navigation/stack/lib/commonjs/index.js',
+    '^@react-navigation/(.*)$': '@react-navigation/$1/lib/commonjs/index.js',
     
     'react-native-linear-gradient': 'react-native-linear-gradient/jest/react-native-linear-gradient.js'
   }
