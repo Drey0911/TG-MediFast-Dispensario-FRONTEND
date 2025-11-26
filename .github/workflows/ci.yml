@@ -2,121 +2,39 @@ name: MediFast CI
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: ["**"]
   pull_request:
+    branches: ["**"]
 
 jobs:
-  build-and-test:
-    name: Lint, Typecheck, Test, Bundle
+  node-ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --ci
+      - run: npx tsc -p tsconfig.json --noEmit
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck (TypeScript)
-        run: npx tsc --noEmit
-
-      - name: Lint
-        run: npm run lint -- --max-warnings=0
-
-      - name: Create Jest setup with all necessary mocks
-        run: |
-          mkdir -p __mocks__
-          
-          # Mock para AsyncStorage
-          cat > __mocks__/@react-native-async-storage/async-storage.js << 'EOF'
-          export default {
-            getItem: jest.fn(() => Promise.resolve(null)),
-            setItem: jest.fn(() => Promise.resolve()),
-            removeItem: jest.fn(() => Promise.resolve()),
-            clear: jest.fn(() => Promise.resolve()),
-            getAllKeys: jest.fn(() => Promise.resolve([])),
-            mergeItem: jest.fn(() => Promise.resolve()),
-            multiGet: jest.fn(() => Promise.resolve([])),
-            multiSet: jest.fn(() => Promise.resolve()),
-            multiRemove: jest.fn(() => Promise.resolve()),
-            multiMerge: jest.fn(() => Promise.resolve()),
-          };
-          EOF
-          
-          # Mock para react-native-linear-gradient
-          cat > __mocks__/react-native-linear-gradient.js << 'EOF'
-          import React from 'react';
-          export default function LinearGradient({ children, ...props }) {
-            return React.createElement('LinearGradient', props, children);
-          }
-          EOF
-          
-          # Mock para react-native-vector-icons
-          cat > __mocks__/react-native-vector-icons.js << 'EOF'
-          export default {
-            createIconSet: () => 'Icon',
-            createIconSetFromIcoMoon: () => 'Icon',
-          };
-          EOF
-          
-          # Mock para archivos estáticos
-          echo 'module.exports = "test-file-stub";' > __mocks__/fileMock.js
-          
-          # Configuración de Jest
-          cat > jest.ci.config.js << 'EOF'
-          module.exports = {
-            preset: 'react-native',
-            moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-            transformIgnorePatterns: [
-              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler|react-native-linear-gradient)/)'
-            ],
-            setupFiles: [
-              './node_modules/react-native-gesture-handler/jestSetup.js'
-            ],
-            moduleNameMapper: {
-              '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/@react-native-async-storage/async-storage.js',
-              '^react-native-linear-gradient$': '<rootDir>/__mocks__/react-native-linear-gradient.js',
-              '^react-native-vector-icons$': '<rootDir>/__mocks__/react-native-vector-icons.js',
-              '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js'
-            },
-            testEnvironment: 'node',
-            collectCoverageFrom: [
-              '**/*.{ts,tsx}',
-              '!**/node_modules/**',
-              '!**/vendor/**',
-              '!**/__mocks__/**'
-            ]
-          };
-          EOF
-
-      - name: Run tests
-        run: npx jest --ci --coverage --config=jest.ci.config.js --passWithNoTests
-
-      - name: Bundle JS (Android)
-        run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output artifacts/index.android.bundle --assets-dest artifacts
-
-      - name: Bundle JS (iOS)
-        run: npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output artifacts/index.ios.bundle --assets-dest artifacts
-
-      - name: Upload bundle artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: js-bundles
-          path: artifacts
-
-  docker-build:
-    name: Build Docker image
+  docker-ci:
     runs-on: ubuntu-latest
+    needs: node-ci
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build image
-        run: docker build -t medifast:ci .
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: medifast:ci
+          push: false
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: docker run --rm medifast:ci npm run lint
+      - run: docker run --rm medifast:ci npm test -- --ci
+      - run: docker run --rm medifast:ci npx tsc -p tsconfig.json --noEmit
