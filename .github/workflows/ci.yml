@@ -30,8 +30,25 @@ jobs:
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
+      - name: Create Jest CI config
+        run: |
+          cat > jest.ci.config.js << 'EOF'
+          module.exports = {
+            preset: 'react-native',
+            transformIgnorePatterns: [
+              'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler)/)'
+            ],
+            setupFiles: [
+              './node_modules/react-native-gesture-handler/jestSetup.js'
+            ],
+            setupFilesAfterEnv: [
+              '@testing-library/jest-native/extend-expect'
+            ]
+          };
+          EOF
+
       - name: Run tests (Jest)
-        run: npm test -- --ci --coverage
+        run: npm test -- --ci --coverage --config=jest.ci.config.js
 
       - name: Bundle JS (Android)
         run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output artifacts/index.android.bundle --assets-dest artifacts
