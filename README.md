@@ -25,6 +25,11 @@ MediFast es una aplicación móvil desarrollada en React Native que facilita la 
 
 MediFast está desarrollado siguiendo el patrón de arquitectura MVP (Modelo-Vista-Presentador):
 
+## Importante (APi Base)
+
+Al ser desarrollada con una arquitectura desacoplada fullstack (Backend - APIREST - Frontend) en el archivo apiBase.ts
+debe ir la URL del backend, sea local (localhost), con tunel (Ngrok o similares) o el URL del deployment.
+
 ### Modelo (Models)
 Contiene las clases de datos y la lógica de negocio:
 - `User.ts`: Modelo para la información del usuario
